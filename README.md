@@ -29,4 +29,4 @@ python app.py
 ```
 
 ## Built by
-**Subhashini Ranga** — B.Tech CSE-Data Science, JNTUGV
+**Subhashini Ranga** — B.Tech CSE-Data Science, Avanthi Institute of Engineering & Technology (JNTUGV)
