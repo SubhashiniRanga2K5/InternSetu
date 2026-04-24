@@ -7,8 +7,9 @@ from bson import ObjectId
 app = Flask(__name__)
 
 # ── CONFIG ──────────────────────────────────────────────────
-app.config["MONGO_URI"] = "mongodb+srv://subhashiniranga16_db_user:subhashini2k5@cluster0.yyy3eyj.mongodb.net/internsetu?appName=Cluster0"
-app.config["JWT_SECRET_KEY"] = "internsetu_secret_2026"
+import os
+app.config["MONGO_URI"] = os.environ.get("MONGO_URI", "mongodb+srv://subhashiniranga16_db_user:subhashini2k5@cluster0.yyy3eyj.mongodb.net/internsetu?appName=Cluster0")
+app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "internsetu_secret_2026")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = False
 
 mongo = PyMongo(app)
@@ -206,4 +207,4 @@ def seed():
     return jsonify({'message': f'Seeded {len(internships)} internships!'}), 201
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)
