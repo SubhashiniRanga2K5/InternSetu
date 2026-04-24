@@ -1,0 +1,6 @@
+flask
+flask-pymongo
+flask-bcrypt
+flask-jwt-extended
+pymongo
+gunicorn
