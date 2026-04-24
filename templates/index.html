@@ -541,7 +541,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div class="dash-layout">
     <div class="sidebar">
       <div class="sidebar-section">
-        <div class="sidebar-item active" id="dash-sb-dashboard"><span class="s-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>Dashboard</div>
+        <div class="sidebar-item active"><span class="s-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>Dashboard</div>
         <div class="sidebar-item" onclick="showPage('browse')"><span class="s-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>Browse<span class="sidebar-badge">12</span></div>
         <div class="sidebar-item" onclick="showPage('applications')"><span class="s-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>Applications<span class="sidebar-badge" id="app-badge">4</span></div>
         <div class="sidebar-item" onclick="showPage('saved')"><span class="s-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></span>Saved</div>
@@ -1217,29 +1217,51 @@ async function autoSeed(){
 autoSeed();
 </script>
 
-<!-- ==================== APPLICATIONS PAGE ==================== -->
+<!-- ============ STYLES FOR NEW PAGES ============ -->
 <style>
-#page-applications,#page-saved,#page-skillgap{display:none;min-height:100vh;background:var(--bg)}
-#page-applications.active,#page-saved.active,#page-skillgap.active{display:flex;flex-direction:column}
+#page-applications,#page-saved,#page-skillgap,#page-company,#page-notifications{display:none;min-height:100vh;background:var(--bg)}
+#page-applications.active,#page-saved.active,#page-skillgap.active,#page-company.active,#page-notifications.active{display:flex;flex-direction:column}
+.page-header{padding:32px 32px 0;margin-bottom:24px}
+.page-header h2{font-family:'Instrument Serif',serif;font-size:24px;font-weight:400;letter-spacing:-0.3px}
+.page-header p{font-size:14px;color:var(--gray);margin-top:4px}
+.app-full-card{background:var(--bg2);border-radius:var(--radius);padding:20px;border:1px solid var(--gray-light);display:flex;align-items:center;gap:14px;transition:all .2s;margin-bottom:12px}
+.app-full-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
 .status-badge{padding:4px 12px;border-radius:100px;font-size:12px;font-weight:700}
 .badge-interview{background:#dcfce7;color:#15803d}
 .badge-applied{background:var(--blue-mid);color:var(--blue-dark)}
 .badge-rejected{background:#fee2e2;color:var(--red)}
 .badge-offer{background:#fef3c7;color:#92400e}
-.app-full-card{background:var(--bg2);border-radius:var(--radius);padding:20px;border:1px solid var(--gray-light);display:flex;align-items:center;gap:14px;transition:all .2s;margin-bottom:12px}
-.app-full-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
 .saved-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:18px}
-.sg-skill-row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--gray-light)}
+.sg-skill-row{display:flex;align-items:center;gap:14px;padding:16px 0;border-bottom:1px solid var(--gray-light);flex-wrap:wrap}
 .sg-skill-row:last-child{border-bottom:none}
-.sg-course-link{display:flex;align-items:center;gap:8px;padding:10px 14px;border:1.5px solid var(--blue-mid);border-radius:9px;font-size:13px;color:var(--blue);font-weight:600;text-decoration:none;cursor:pointer;transition:all .15s;background:var(--blue-light)}
-.sg-course-link:hover{background:var(--blue);color:#fff}
-.page-header{padding:32px 32px 0;margin-bottom:24px}
-.page-header h2{font-family:'Instrument Serif',serif;font-size:24px;font-weight:400;letter-spacing:-0.3px}
-.page-header p{font-size:14px;color:var(--gray);margin-top:4px}
+.sg-course-link{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border:1.5px solid var(--blue-mid);border-radius:8px;font-size:12px;color:var(--blue);font-weight:600;text-decoration:none;cursor:pointer;transition:all .15s;background:var(--blue-light)}
+.sg-course-link:hover{background:var(--blue);color:#fff;border-color:var(--blue)}
+.notif-item{display:flex;align-items:flex-start;gap:14px;padding:16px 0;border-bottom:1px solid var(--gray-light)}
+.notif-item:last-child{border-bottom:none}
+.notif-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.notif-dot.unread{background:var(--blue)}
+.notif-dot.read{background:var(--gray-light)}
+/* notification bell */
+.notif-bell{position:relative;cursor:pointer;padding:7px 14px;border-radius:8px;font-size:14px;font-weight:500;color:var(--gray);transition:background .15s}
+.notif-bell:hover{background:var(--blue-light);color:var(--blue)}
+.notif-count{position:absolute;top:3px;right:6px;background:var(--red);color:#fff;border-radius:100px;font-size:10px;font-weight:700;padding:1px 5px;min-width:16px;text-align:center}
+/* company form */
+.company-form{max-width:600px}
+.company-form .form-group{margin-bottom:20px}
+.company-form label{display:block;font-size:13px;font-weight:600;color:var(--navy2);margin-bottom:7px}
+.company-form input,.company-form select,.company-form textarea{width:100%;padding:12px 14px;border:1.5px solid var(--gray-light);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;background:#fff;color:var(--navy);transition:border-color .2s;outline:none;resize:vertical}
+.company-form input:focus,.company-form select:focus,.company-form textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(36,97,232,.1)}
 </style>
 
+<!-- ========== APPLICATIONS PAGE ========== -->
 <div id="page-applications" class="page">
-  <nav><div class="nav-logo" onclick="showPage('landing')"><div class="logo-mark">IS</div><span>InternSetu</span></div><div class="nav-links"><a onclick="showPage('browse')">Browse</a><a class="user-nav-name" href="#">👤 User</a></div></nav>
+  <nav>
+    <div class="nav-logo" onclick="showPage('landing')"><div class="logo-mark">IS</div><span>InternSetu</span></div>
+    <div class="nav-links">
+      <span class="notif-bell" onclick="showPage('notifications')">🔔<span class="notif-count" id="notif-count-nav">3</span></span>
+      <a class="user-nav-name" href="#">👤 User</a>
+    </div>
+  </nav>
   <div class="dash-layout">
     <div class="sidebar">
       <div class="sidebar-section">
@@ -1259,17 +1281,18 @@ autoSeed();
       </div>
     </div>
     <div class="dash-main">
-      <div class="page-header"><h2>My Applications</h2><p id="apps-subtitle">Loading your applications…</p></div>
-      <div id="apps-list" style="max-width:720px">
-        <div style="text-align:center;padding:40px;color:var(--gray)">Loading…</div>
-      </div>
+      <div class="page-header"><h2>My Applications</h2><p id="apps-subtitle">Loading…</p></div>
+      <div id="apps-list" style="max-width:720px"></div>
     </div>
   </div>
 </div>
 
-<!-- ==================== SAVED PAGE ==================== -->
+<!-- ========== SAVED PAGE ========== -->
 <div id="page-saved" class="page">
-  <nav><div class="nav-logo" onclick="showPage('landing')"><div class="logo-mark">IS</div><span>InternSetu</span></div><div class="nav-links"><a onclick="showPage('browse')">Browse</a><a class="user-nav-name" href="#">👤 User</a></div></nav>
+  <nav>
+    <div class="nav-logo" onclick="showPage('landing')"><div class="logo-mark">IS</div><span>InternSetu</span></div>
+    <div class="nav-links"><a onclick="showPage('browse')">Browse</a><a class="user-nav-name" href="#">👤 User</a></div>
+  </nav>
   <div class="dash-layout">
     <div class="sidebar">
       <div class="sidebar-section">
@@ -1290,16 +1313,17 @@ autoSeed();
     </div>
     <div class="dash-main">
       <div class="page-header"><h2>Saved Internships</h2><p id="saved-subtitle">Roles you bookmarked</p></div>
-      <div id="saved-grid" class="saved-grid">
-        <div style="text-align:center;padding:40px;color:var(--gray)">Loading…</div>
-      </div>
+      <div id="saved-grid" class="saved-grid"></div>
     </div>
   </div>
 </div>
 
-<!-- ==================== SKILL GAP PAGE ==================== -->
+<!-- ========== SKILL GAP PAGE ========== -->
 <div id="page-skillgap" class="page">
-  <nav><div class="nav-logo" onclick="showPage('landing')"><div class="logo-mark">IS</div><span>InternSetu</span></div><div class="nav-links"><a onclick="showPage('browse')">Browse</a><a class="user-nav-name" href="#">👤 User</a></div></nav>
+  <nav>
+    <div class="nav-logo" onclick="showPage('landing')"><div class="logo-mark">IS</div><span>InternSetu</span></div>
+    <div class="nav-links"><a onclick="showPage('browse')">Browse</a><a class="user-nav-name" href="#">👤 User</a></div>
+  </nav>
   <div class="dash-layout">
     <div class="sidebar">
       <div class="sidebar-section">
@@ -1319,65 +1343,60 @@ autoSeed();
       </div>
     </div>
     <div class="dash-main">
-      <div class="page-header"><h2>Skill Gap Analysis</h2><p>Skills to learn to unlock more internships</p></div>
+      <div class="page-header"><h2>Skill Gap Analysis</h2><p>Learn these to unlock 40+ more matches</p></div>
       <div style="max-width:720px">
-        <!-- SKILL GAP CARDS -->
         <div class="dash-card" style="margin-bottom:18px">
-          <h3>Skills You're Missing 🎯</h3>
-          <p style="font-size:13px;color:var(--gray);margin-bottom:20px">Based on top internships in your domain — learn these to unlock 40+ more matches</p>
-          <div id="sg-missing-list">
-            <!-- populated by JS or static -->
-            <div class="sg-skill-row">
-              <div style="flex:1">
-                <div style="font-size:14px;font-weight:600;margin-bottom:4px">System Design</div>
-                <div style="font-size:12px;color:var(--gray)">Required in 18 internships you're missing</div>
-                <div class="skill-bar" style="margin-top:8px;height:5px"><div class="skill-fill" data-w="30" style="width:30%;background:var(--orange)"></div></div>
-              </div>
-              <div style="display:flex;gap:8px;flex-shrink:0">
-                <a class="sg-course-link" href="https://www.youtube.com/results?search_query=system+design+crash+course" target="_blank">▶ YouTube</a>
-                <a class="sg-course-link" href="https://www.coursera.org/search?query=system+design" target="_blank">📚 Coursera</a>
-              </div>
+          <h3>Missing Skills 🎯</h3>
+          <p style="font-size:13px;color:var(--gray);margin-bottom:20px">Top skills required in internships you're missing right now</p>
+          <div class="sg-skill-row">
+            <div style="flex:1;min-width:200px">
+              <div style="font-size:14px;font-weight:600;margin-bottom:3px">Data Structures & Algorithms</div>
+              <div style="font-size:12px;color:var(--gray);margin-bottom:8px">Required in 22 internships — Google, Amazon, Microsoft</div>
+              <div class="skill-bar"><div style="height:5px;background:var(--orange);border-radius:3px;width:45%"></div></div>
             </div>
-            <div class="sg-skill-row">
-              <div style="flex:1">
-                <div style="font-size:14px;font-weight:600;margin-bottom:4px">Docker / DevOps</div>
-                <div style="font-size:12px;color:var(--gray)">Required in 14 internships</div>
-                <div class="skill-bar" style="margin-top:8px;height:5px"><div class="skill-fill" data-w="20" style="width:20%;background:var(--orange)"></div></div>
-              </div>
-              <div style="display:flex;gap:8px;flex-shrink:0">
-                <a class="sg-course-link" href="https://www.youtube.com/results?search_query=docker+for+beginners" target="_blank">▶ YouTube</a>
-                <a class="sg-course-link" href="https://www.udemy.com/topic/docker/" target="_blank">📚 Udemy</a>
-              </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <a class="sg-course-link" href="https://leetcode.com" target="_blank">💻 LeetCode</a>
+              <a class="sg-course-link" href="https://www.youtube.com/results?search_query=DSA+complete+course+in+Telugu" target="_blank">▶ YouTube</a>
             </div>
-            <div class="sg-skill-row">
-              <div style="flex:1">
-                <div style="font-size:14px;font-weight:600;margin-bottom:4px">AWS / Cloud Basics</div>
-                <div style="font-size:12px;color:var(--gray)">Required in 12 internships</div>
-                <div class="skill-bar" style="margin-top:8px;height:5px"><div class="skill-fill" data-w="15" style="width:15%;background:var(--red)"></div></div>
-              </div>
-              <div style="display:flex;gap:8px;flex-shrink:0">
-                <a class="sg-course-link" href="https://www.youtube.com/results?search_query=aws+cloud+practitioner+2024" target="_blank">▶ YouTube</a>
-                <a class="sg-course-link" href="https://aws.amazon.com/training/free-digital-training/" target="_blank">📚 AWS Free</a>
-              </div>
+          </div>
+          <div class="sg-skill-row">
+            <div style="flex:1;min-width:200px">
+              <div style="font-size:14px;font-weight:600;margin-bottom:3px">System Design</div>
+              <div style="font-size:12px;color:var(--gray);margin-bottom:8px">Required in 18 internships</div>
+              <div class="skill-bar"><div style="height:5px;background:var(--orange);border-radius:3px;width:30%"></div></div>
             </div>
-            <div class="sg-skill-row">
-              <div style="flex:1">
-                <div style="font-size:14px;font-weight:600;margin-bottom:4px">Data Structures & Algorithms</div>
-                <div style="font-size:12px;color:var(--gray)">Required in 22 internships (Google, Amazon, Microsoft)</div>
-                <div class="skill-bar" style="margin-top:8px;height:5px"><div class="skill-fill" data-w="45" style="width:45%;background:var(--orange)"></div></div>
-              </div>
-              <div style="display:flex;gap:8px;flex-shrink:0">
-                <a class="sg-course-link" href="https://leetcode.com" target="_blank">💻 LeetCode</a>
-                <a class="sg-course-link" href="https://www.youtube.com/results?search_query=DSA+complete+course" target="_blank">▶ YouTube</a>
-              </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <a class="sg-course-link" href="https://www.youtube.com/results?search_query=system+design+crash+course" target="_blank">▶ YouTube</a>
+              <a class="sg-course-link" href="https://www.educative.io/courses/grokking-the-system-design-interview" target="_blank">📚 Educative</a>
+            </div>
+          </div>
+          <div class="sg-skill-row">
+            <div style="flex:1;min-width:200px">
+              <div style="font-size:14px;font-weight:600;margin-bottom:3px">Docker / DevOps</div>
+              <div style="font-size:12px;color:var(--gray);margin-bottom:8px">Required in 14 internships</div>
+              <div class="skill-bar"><div style="height:5px;background:var(--orange);border-radius:3px;width:20%"></div></div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <a class="sg-course-link" href="https://www.youtube.com/results?search_query=docker+for+beginners+2024" target="_blank">▶ YouTube</a>
+              <a class="sg-course-link" href="https://www.udemy.com/topic/docker/" target="_blank">📚 Udemy</a>
+            </div>
+          </div>
+          <div class="sg-skill-row">
+            <div style="flex:1;min-width:200px">
+              <div style="font-size:14px;font-weight:600;margin-bottom:3px">AWS Cloud Basics</div>
+              <div style="font-size:12px;color:var(--gray);margin-bottom:8px">Required in 12 internships</div>
+              <div class="skill-bar"><div style="height:5px;background:var(--red);border-radius:3px;width:15%"></div></div>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <a class="sg-course-link" href="https://aws.amazon.com/training/free-digital-training/" target="_blank">📚 AWS Free</a>
+              <a class="sg-course-link" href="https://www.youtube.com/results?search_query=aws+cloud+practitioner+2024" target="_blank">▶ YouTube</a>
             </div>
           </div>
         </div>
 
-        <!-- STRENGTHS -->
         <div class="dash-card" style="margin-bottom:18px">
           <h3>Your Strengths ✅</h3>
-          <p style="font-size:13px;color:var(--gray);margin-bottom:16px">Skills that are already unlocking matches</p>
+          <p style="font-size:13px;color:var(--gray);margin-bottom:16px">Skills already unlocking matches for you</p>
           <div id="sg-strengths" style="display:flex;flex-wrap:wrap;gap:8px">
             <span style="background:#dcfce7;color:#15803d;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid #bbf7d0">React ✓</span>
             <span style="background:#dcfce7;color:#15803d;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid #bbf7d0">Python ✓</span>
@@ -1385,27 +1404,27 @@ autoSeed();
             <span style="background:#dcfce7;color:#15803d;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid #bbf7d0">SQL ✓</span>
             <span style="background:#dcfce7;color:#15803d;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid #bbf7d0">Figma ✓</span>
             <span style="background:#dcfce7;color:#15803d;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid #bbf7d0">TypeScript ✓</span>
+            <span style="background:#dcfce7;color:#15803d;padding:6px 14px;border-radius:8px;font-size:13px;font-weight:600;border:1px solid #bbf7d0">Git ✓</span>
           </div>
         </div>
 
-        <!-- LEARNING PLAN -->
         <div class="dash-card">
           <h3>30-Day Learning Plan 📅</h3>
-          <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px">
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:8px">
             <div style="background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:12px;padding:16px">
-              <div style="font-size:12px;font-weight:700;color:var(--blue);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Week 1–2</div>
+              <div style="font-size:11px;font-weight:700;color:var(--blue);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px">Week 1–2</div>
               <div style="font-size:14px;font-weight:600;margin-bottom:4px">DSA Fundamentals</div>
               <div style="font-size:13px;color:var(--gray)">Arrays, Strings, HashMaps on LeetCode — 2 problems/day → unlocks Google, Amazon, Microsoft roles</div>
             </div>
             <div style="background:var(--bg);border:1px solid var(--gray-light);border-radius:12px;padding:16px">
-              <div style="font-size:12px;font-weight:700;color:var(--gray);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Week 3</div>
+              <div style="font-size:11px;font-weight:700;color:var(--gray);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px">Week 3</div>
               <div style="font-size:14px;font-weight:600;margin-bottom:4px">System Design Basics</div>
-              <div style="font-size:13px;color:var(--gray)">Watch Gaurav Sen's System Design playlist on YouTube — 1 video/day → unlocks 18 more roles</div>
+              <div style="font-size:13px;color:var(--gray)">Gaurav Sen's System Design playlist — 1 video/day → unlocks 18 more roles</div>
             </div>
             <div style="background:var(--bg);border:1px solid var(--gray-light);border-radius:12px;padding:16px">
-              <div style="font-size:12px;font-weight:700;color:var(--gray);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Week 4</div>
+              <div style="font-size:11px;font-weight:700;color:var(--gray);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:6px">Week 4</div>
               <div style="font-size:14px;font-weight:600;margin-bottom:4px">Docker + AWS Free Tier</div>
-              <div style="font-size:13px;color:var(--gray)">Build and deploy a project using Docker + AWS EC2 → real project for resume + unlocks 14 more roles</div>
+              <div style="font-size:13px;color:var(--gray)">Deploy a project on AWS EC2 using Docker → real portfolio project + unlocks 14 more roles</div>
             </div>
           </div>
         </div>
@@ -1414,62 +1433,172 @@ autoSeed();
   </div>
 </div>
 
+<!-- ========== NOTIFICATIONS PAGE ========== -->
+<div id="page-notifications" class="page">
+  <nav>
+    <div class="nav-logo" onclick="showPage('landing')"><div class="logo-mark">IS</div><span>InternSetu</span></div>
+    <div class="nav-links"><a onclick="showPage('dashboard')">Dashboard</a><a class="user-nav-name" href="#">👤 User</a></div>
+  </nav>
+  <div class="dash-layout">
+    <div class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-item" onclick="showPage('dashboard')"><span class="s-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>Dashboard</div>
+        <div class="sidebar-item" onclick="showPage('browse')"><span class="s-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>Browse</div>
+        <div class="sidebar-item" onclick="showPage('applications')"><span class="s-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>Applications</div>
+        <div class="sidebar-item" onclick="showPage('saved')"><span class="s-icon"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></span>Saved</div>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Account</div>
+        <div class="sidebar-item" onclick="doLogout()"><span class="s-icon"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>Sign out</div>
+      </div>
+    </div>
+    <div class="dash-main">
+      <div class="page-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+        <div><h2>Notifications</h2><p>Stay updated on your applications & matches</p></div>
+        <button class="btn btn-outline" style="font-size:13px;padding:8px 16px" onclick="markAllRead()">Mark all read</button>
+      </div>
+      <div class="dash-card" style="max-width:720px">
+        <div class="notif-item">
+          <div class="notif-dot unread"></div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:600;margin-bottom:3px">🎯 New match: Razorpay Product Intern — 94% match!</div>
+            <div style="font-size:12px;color:var(--gray)">Just now · Bangalore · ₹25,000/mo</div>
+          </div>
+          <button class="btn btn-primary" style="font-size:12px;padding:6px 14px;flex-shrink:0" onclick="showPage('browse')">View →</button>
+        </div>
+        <div class="notif-item">
+          <div class="notif-dot unread"></div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:600;margin-bottom:3px">⏰ Deadline alert: Meesho SDE closes in 1 day!</div>
+            <div style="font-size:12px;color:var(--orange)">Today · Don't miss it</div>
+          </div>
+          <button class="btn btn-outline" style="font-size:12px;padding:6px 14px;flex-shrink:0;border-color:var(--orange);color:var(--orange)" onclick="showPage('browse')">Apply →</button>
+        </div>
+        <div class="notif-item">
+          <div class="notif-dot unread"></div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:600;margin-bottom:3px">🎉 Google STEP — Interview scheduled!</div>
+            <div style="font-size:12px;color:var(--green);font-weight:600">Yesterday · Congratulations!</div>
+          </div>
+          <span style="font-size:12px;color:var(--green);font-weight:700">Interview ✓</span>
+        </div>
+        <div class="notif-item">
+          <div class="notif-dot read"></div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:600;margin-bottom:3px;color:var(--gray)">Profile completion: Add resume to reach 90%</div>
+            <div style="font-size:12px;color:var(--gray)">2 days ago</div>
+          </div>
+          <button class="btn btn-outline" style="font-size:12px;padding:6px 14px;flex-shrink:0" onclick="showPage('profile')">Update →</button>
+        </div>
+        <div class="notif-item">
+          <div class="notif-dot read"></div>
+          <div style="flex:1">
+            <div style="font-size:14px;font-weight:600;margin-bottom:3px;color:var(--gray)">🆕 15 new internships added this week</div>
+            <div style="font-size:12px;color:var(--gray)">3 days ago · Check what's new</div>
+          </div>
+          <button class="btn btn-outline" style="font-size:12px;padding:6px 14px;flex-shrink:0" onclick="showPage('browse')">Browse →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== FOR COMPANIES PAGE ========== -->
+<div id="page-company" class="page" style="background:var(--bg2)">
+  <nav>
+    <div class="nav-logo" onclick="showPage('landing')"><div class="logo-mark">IS</div><span>InternSetu</span></div>
+    <div class="nav-links"><a onclick="showPage('landing')">← Back to Home</a></div>
+  </nav>
+  <div style="max-width:1000px;margin:0 auto;padding:60px 24px">
+    <!-- HERO -->
+    <div style="text-align:center;margin-bottom:60px">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:var(--blue-light);color:var(--blue);padding:6px 16px;border-radius:100px;font-size:13px;font-weight:600;margin-bottom:24px;border:1px solid var(--blue-mid)">🏢 For Companies</div>
+      <h1 style="font-family:'Instrument Serif',serif;font-size:clamp(32px,5vw,54px);font-weight:400;letter-spacing:-1px;color:var(--navy);margin-bottom:16px">Stop sifting through<br><em style="color:var(--blue);font-style:italic">500 irrelevant applications</em></h1>
+      <p style="font-size:17px;color:var(--gray);max-width:520px;margin:0 auto 36px;line-height:1.75">InternSetu sends you only pre-matched, verified students who fit your exact requirement. On average, companies receive 8 qualified applicants — not 500 random ones.</p>
+      <div style="display:flex;gap:32px;justify-content:center;flex-wrap:wrap;margin-bottom:48px">
+        <div style="text-align:center"><div style="font-size:28px;font-weight:700;color:var(--blue);letter-spacing:-1px">8x</div><div style="font-size:13px;color:var(--gray)">Better applicant quality</div></div>
+        <div style="text-align:center"><div style="font-size:28px;font-weight:700;color:var(--blue);letter-spacing:-1px">72%</div><div style="font-size:13px;color:var(--gray)">Avg PPO conversion</div></div>
+        <div style="text-align:center"><div style="font-size:28px;font-weight:700;color:var(--blue);letter-spacing:-1px">10k+</div><div style="font-size:13px;color:var(--gray)">Verified student profiles</div></div>
+      </div>
+    </div>
+
+    <!-- POST FORM -->
+    <div style="background:#fff;border-radius:24px;border:1px solid var(--gray-light);padding:40px;box-shadow:var(--shadow)">
+      <h2 style="font-family:'Instrument Serif',serif;font-size:26px;font-weight:400;margin-bottom:6px;letter-spacing:-0.3px">Post an Internship</h2>
+      <p style="font-size:14px;color:var(--gray);margin-bottom:28px">Free to post · Goes live in 24 hours after review</p>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px" class="company-form">
+        <div class="form-group"><label>Company Name *</label><input type="text" placeholder="e.g. Razorpay"/></div>
+        <div class="form-group"><label>Role Title *</label><input type="text" placeholder="e.g. Product Management Intern"/></div>
+        <div class="form-group"><label>Domain</label>
+          <select>
+            <option>Software / Tech</option><option>Data Science / ML</option><option>UI/UX Design</option>
+            <option>Marketing / Growth</option><option>Finance</option><option>Operations</option><option>Business Analytics</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Stipend (₹/month)</label><input type="number" placeholder="e.g. 25000"/></div>
+        <div class="form-group"><label>Location</label><input type="text" placeholder="e.g. Bangalore / Remote"/></div>
+        <div class="form-group"><label>Duration</label>
+          <select><option>1–2 months</option><option>3 months</option><option>6 months</option><option>6 months+</option></select>
+        </div>
+        <div class="form-group" style="grid-column:1/-1"><label>Required Skills (comma separated)</label><input type="text" placeholder="e.g. React, Node.js, SQL, Product Thinking"/></div>
+        <div class="form-group" style="grid-column:1/-1"><label>Job Description *</label><textarea rows="5" placeholder="Describe the role, responsibilities, and what the intern will work on…"></textarea></div>
+        <div class="form-group"><label>Your Name</label><input type="text" placeholder="HR / Hiring Manager name"/></div>
+        <div class="form-group"><label>Work Email *</label><input type="email" placeholder="hr@company.com"/></div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:8px;font-size:15px;padding:14px" onclick="submitCompanyForm()">Post Internship Free →</button>
+      <p style="text-align:center;font-size:12px;color:var(--gray);margin-top:14px">Free forever for small teams · Premium plans coming soon</p>
+    </div>
+  </div>
+</div>
+
 <script>
-// ── APPLICATIONS PAGE ─────────────────────────────────
+// ── APPLICATIONS PAGE ─────────────────────────────
 const staticApps = [
   {company:'Google',role:'STEP Intern',logo:'G',status:'Interview',date:'3 days ago'},
   {company:'Flipkart',role:'SDE Intern',logo:'F',status:'Applied',date:'5 days ago'},
   {company:'Swiggy',role:'Product Intern',logo:'S',status:'Applied',date:'7 days ago'},
   {company:'BrowserStack',role:'QA Automation',logo:'B',status:'Rejected',date:'10 days ago'},
 ];
+const statusClass = {Interview:'badge-interview',Applied:'badge-applied',Rejected:'badge-rejected',Offer:'badge-offer'};
 
 async function loadApplicationsPage(){
   const list = document.getElementById('apps-list');
   const subtitle = document.getElementById('apps-subtitle');
   let apps = [];
-  try {
-    const res = await apiCall('/api/applications');
-    if(res.ok) apps = await res.json();
-  } catch(e){}
+  try { const res = await apiCall('/api/applications'); if(res.ok) apps = await res.json(); } catch(e){}
   if(!apps.length) apps = staticApps;
   subtitle.textContent = apps.length + ' total applications';
   const badge = document.getElementById('app-badge');
   if(badge) badge.textContent = apps.length;
-  const statusClass = {Interview:'badge-interview',Applied:'badge-applied',Rejected:'badge-rejected',Offer:'badge-offer'};
+  if(!apps.length){
+    list.innerHTML = `<div class="dash-card" style="text-align:center;padding:48px"><div style="font-size:40px;margin-bottom:12px">📄</div><h3 style="font-size:17px;font-weight:600;margin-bottom:8px">No applications yet</h3><p style="color:var(--gray);margin-bottom:20px">Browse internships and hit Apply!</p><button class="btn btn-primary" onclick="showPage('browse')">Browse now →</button></div>`;
+    return;
+  }
   list.innerHTML = apps.map(a => `
     <div class="app-full-card">
-      <div class="app-logo">${(a.logo||a.company[0])}</div>
+      <div class="app-logo">${a.logo||a.company[0]}</div>
       <div style="flex:1">
-        <div style="font-size:14px;font-weight:600">${a.role||a.intern_id||'Intern'}</div>
-        <div style="font-size:13px;color:var(--gray);margin-top:2px">${a.company||'Company'} · Applied ${a.date||'recently'}</div>
+        <div style="font-size:14px;font-weight:600">${a.role||'Intern'}</div>
+        <div style="font-size:12px;color:var(--gray);margin-top:2px">${a.company||'Company'} · Applied ${a.date||'recently'}</div>
       </div>
       <span class="status-badge ${statusClass[a.status]||'badge-applied'}">${a.status||'Applied'}</span>
-    </div>
-  `).join('') || '<div style="text-align:center;padding:40px;color:var(--gray)"><p style="font-size:16px;font-weight:600;margin-bottom:8px">No applications yet</p><p>Go browse internships and apply!</p></div>';
+    </div>`).join('');
 }
 
-// ── SAVED PAGE ────────────────────────────────────────
+// ── SAVED PAGE ─────────────────────────────────────
 async function loadSavedPage(){
   const grid = document.getElementById('saved-grid');
   const subtitle = document.getElementById('saved-subtitle');
   let saved = [];
-  try {
-    const res = await apiCall('/api/bookmarks');
-    if(res.ok) saved = await res.json();
-  } catch(e){}
+  try { const res = await apiCall('/api/bookmarks'); if(res.ok) saved = await res.json(); } catch(e){}
   if(!saved.length){
-    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px">
-      <div style="font-size:40px;margin-bottom:16px">🔖</div>
-      <h3 style="font-size:18px;font-weight:600;margin-bottom:8px">No saved internships yet</h3>
-      <p style="color:var(--gray);margin-bottom:20px">Browse internships and click Save to add them here</p>
-      <button class="btn btn-primary" onclick="showPage('browse')">Browse Internships →</button>
-    </div>`;
-    subtitle.textContent = '0 saved roles';
-    return;
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px"><div style="font-size:44px;margin-bottom:16px">🔖</div><h3 style="font-size:18px;font-weight:600;margin-bottom:8px">No saved internships yet</h3><p style="color:var(--gray);margin-bottom:20px">Hit the Save button on any internship card</p><button class="btn btn-primary" onclick="showPage('browse')">Browse Internships →</button></div>`;
+    subtitle.textContent = '0 saved roles'; return;
   }
   subtitle.textContent = saved.length + ' saved roles';
-  grid.innerHTML = saved.map(i => {
-    const tags = i.tags || (i.skills||[]).slice(0,3);
+  grid.innerHTML = saved.map(i=>{
+    const tags = i.tags||(i.skills||[]).slice(0,3);
     return `<div class="intern-card" onclick="openDetail('${i.id}','${i.company}','${i.role}',${i.stipend},${i.match_score||75},'${i.location}','${i.deadline}','${tags.join(',')}')">
       <div class="ic-header"><div class="ic-company"><div class="ic-logo">${i.logo||i.company[0]}</div><div class="ic-info"><h4>${i.company}</h4><p>${i.location} · ${i.role}</p></div></div><div class="ic-match">${i.match_score||75}%</div></div>
       <div class="ic-tags">${tags.map(t=>`<span class="ic-tag">${t}</span>`).join('')}</div>
@@ -1480,54 +1609,79 @@ async function loadSavedPage(){
   attachHover(grid);
 }
 
-// ── PROFILE SAVE TO DB ─────────────────────────────────
-async function saveAbout(){
-  const text = document.getElementById('aboutText').value;
-  document.getElementById('aboutView').innerHTML=`<p style="font-size:14px;color:var(--gray);line-height:1.75">${text}</p>`;
-  toggleEditMode();
-  try {
-    await apiCall('/api/user/profile','PUT',{about: text});
-    showToast('Profile updated!');
-  } catch(e){ showToast('Saved locally!'); }
+// ── NOTIFICATIONS ──────────────────────────────────
+function markAllRead(){
+  document.querySelectorAll('.notif-dot.unread').forEach(d=>d.classList.replace('unread','read'));
+  document.querySelectorAll('.notif-count').forEach(el=>el.style.display='none');
+  showToast('All notifications marked as read!');
 }
 
-async function addSkill(){
-  const inp=document.getElementById('newSkill');
-  const val=inp.value.trim();
-  if(!val)return;
-  const skillsWrap=inp.parentElement.previousElementSibling;
-  const tag=document.createElement('span');
-  tag.style.cssText='background:var(--blue-light);color:var(--blue);padding:5px 13px;border-radius:7px;font-size:13px;font-weight:600;border:1px solid var(--blue-mid)';
-  tag.textContent=val;
-  skillsWrap.appendChild(tag);
-  inp.value='';
-  // Save updated skills to DB
-  const allSkills = [...skillsWrap.querySelectorAll('span')].map(s=>s.textContent.trim()).filter(Boolean);
-  try { await apiCall('/api/user/profile','PUT',{skills: allSkills}); } catch(e){}
+// ── COMPANY FORM ───────────────────────────────────
+function submitCompanyForm(){
+  showToast('Internship submitted! Goes live within 24 hours 🎉');
 }
 
-// ── PATCH showPage to support new pages ───────────────
-const _origShowPage = showPage;
+// ── "For Companies" link on landing nav ───────────
+document.querySelectorAll('a[href="#"]').forEach(a=>{
+  if(a.textContent.trim()==='For Companies') a.onclick=()=>showPage('company');
+});
+
+// ── NOTIFICATION BELL on dashboard nav ────────────
+// Add bell to dashboard nav
+const dashNav = document.querySelector('#page-dashboard nav .nav-links');
+if(dashNav){
+  const bell = document.createElement('span');
+  bell.className='notif-bell';
+  bell.innerHTML='🔔<span class="notif-count">3</span>';
+  bell.onclick=()=>showPage('notifications');
+  dashNav.insertBefore(bell, dashNav.firstChild);
+}
+
+// ── PATCH showPage for all new pages ──────────────
+const _orig = window.showPage;
 window.showPage = function(n){
-  if(['applications','saved','skillgap'].includes(n) && !getToken() && !currentUser){
-    showPage('login'); return;
+  const newPages = ['applications','saved','skillgap','notifications','company'];
+  if(newPages.includes(n) && !getToken() && !currentUser && n!=='company'){
+    _orig('login'); return;
   }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   const pg = document.getElementById('page-'+n);
-  if(!pg){ _origShowPage(n); return; }
-  pg.classList.add('active');
-  window.scrollTo(0,0);
-  if(n==='browse') loadInternships();
-  if(n==='dashboard'){ setTimeout(animateSkillBars,400); loadDashboard(); }
-  if(n==='landing') setTimeout(animateCounters,500);
-  if(n==='login') resetAuthForms();
-  if(n==='applications') loadApplicationsPage();
-  if(n==='saved') loadSavedPage();
-  // update user-nav-name on new pages
-  const name = localStorage.getItem('is_name');
-  if(name) updateNavForUser(name);
+  if(pg){
+    pg.classList.add('active');
+    window.scrollTo(0,0);
+    const name = localStorage.getItem('is_name');
+    if(name) updateNavForUser(name);
+    if(n==='applications') loadApplicationsPage();
+    if(n==='saved') loadSavedPage();
+  } else {
+    _orig(n);
+  }
+};
+
+// ── PROFILE: save about + skills to DB ────────────
+const _origSaveAbout = window.saveAbout;
+window.saveAbout = async function(){
+  const text = document.getElementById('aboutText').value;
+  document.getElementById('aboutView').innerHTML=`<p style="font-size:14px;color:var(--gray);line-height:1.75">${text}</p>`;
+  toggleEditMode();
+  try{ await apiCall('/api/user/profile','PUT',{about:text}); showToast('Profile saved!'); }catch(e){ showToast('Saved!'); }
+};
+
+const _origAddSkill = window.addSkill;
+window.addSkill = async function(){
+  const inp = document.getElementById('newSkill');
+  const val = inp.value.trim();
+  if(!val) return;
+  const wrap = inp.parentElement.previousElementSibling;
+  const tag = document.createElement('span');
+  tag.style.cssText='background:var(--blue-light);color:var(--blue);padding:5px 13px;border-radius:7px;font-size:13px;font-weight:600;border:1px solid var(--blue-mid)';
+  tag.textContent = val;
+  wrap.appendChild(tag);
+  inp.value = '';
+  const allSkills = [...wrap.querySelectorAll('span')].map(s=>s.textContent.trim()).filter(Boolean);
+  try{ await apiCall('/api/user/profile','PUT',{skills:allSkills}); }catch(e){}
+  showToast('Skill added & saved!');
 };
 </script>
-
 </body>
 </html>
