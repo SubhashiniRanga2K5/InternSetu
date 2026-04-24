@@ -7,7 +7,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  --bg: #232324; --bg2: #ffffff; --blue: #2461e8; --blue-light: #eef3ff; --blue-mid: #d4e1fd; --blue-dark: #1a45c0;
+  --bg: #f8f9ff; --bg2: #ffffff; --blue: #2461e8; --blue-light: #eef3ff; --blue-mid: #d4e1fd; --blue-dark: #1a45c0;
   --navy: #0c1428; --navy2: #1e2a45; --gray: #5a6a85; --gray-light: #e8ecf5;
   --green: #0ea96e; --orange: #e8920a; --red: #e03535;
   --shadow: 0 2px 16px rgba(36,97,232,0.08); --shadow-md: 0 4px 24px rgba(36,97,232,0.13); --shadow-lg: 0 8px 40px rgba(36,97,232,0.18);
@@ -434,7 +434,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <p class="sub">10,000+ students found their internship through InternSetu.</p>
     <div class="testimonials-landing">
       <div class="tl-card"><div class="tl-stars"><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div></div><p class="tl-text">"Matched with Razorpay in 2 days. The AI knew what I wanted better than I did. Got the offer in week 2."</p><div class="tl-author"><div class="tl-avatar">SR</div><div><div class="tl-name">Sravani Reddy</div><div class="tl-college">CSE · JNTU Hyderabad</div></div></div></div>
-      <div class="tl-card"><div class="tl-stars"><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div></div><p class="tl-text">"3 interview calls in the first week. One-click apply is incredible. Applied to 6 places, got 3 callbacks."</p><div class="tl-author"><div class="tl-avatar">AS</div><div><div class="tl-name">Arjun Sharma</div><div class="tl-college">ECE · IIT Bombay</div></div></div></div>
+      <div class="tl-card"><div class="tl-stars"><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div></div><p class="tl-text">"3 interview calls in the first week. One-click apply is incredible. Applied to 6 places, got 3 callbacks."</p><div class="tl-author"><div class="tl-avatar">AS</div><div><div class="tl-name">Arjun Ranga</div><div class="tl-college">ECE · IIT Bombay</div></div></div></div>
       <div class="tl-card"><div class="tl-stars"><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div></div><p class="tl-text">"Skill gap feature told me to learn Figma. Two months later I landed at CRED as a design intern."</p><div class="tl-author"><div class="tl-avatar">MI</div><div><div class="tl-name">Meghana Iyer</div><div class="tl-college">Design · NID Ahmedabad</div></div></div></div>
     </div>
   </section>
@@ -483,10 +483,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <h2>Welcome back</h2><p class="sub">Sign in to continue your internship journey</p>
         <button class="google-btn"><svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>Continue with Google</button>
         <div class="divider"><span>or continue with email</span></div>
-        <div class="form-group"><label>Email address</label><input type="email" placeholder="you@college.edu"/></div>
-        <div class="form-group"><label>Password</label><input type="password" placeholder="Enter your password"/></div>
+        <div id="authError" style="display:none;background:#fee2e2;color:#b91c1c;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:500;margin-bottom:14px;border:1px solid #fecaca"></div>
+        <div class="form-group"><label>Email address</label><input id="loginEmail" type="email" placeholder="you@college.edu"/></div>
+        <div class="form-group"><label>Password</label><input id="loginPass" type="password" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()"/></div>
         <p class="forgot">Forgot password?</p>
-        <button class="btn btn-primary" style="width:100%" onclick="showPage('dashboard')">Sign in →</button>
+        <button id="loginBtn" class="btn btn-primary" style="width:100%" onclick="doLogin()">Sign in →</button>
         <p class="auth-switch">Don't have an account? <a onclick="showPage('register')">Create one free</a></p>
       </div>
     </div>
@@ -494,7 +495,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <h3>What students say</h3>
       <div class="testimonials">
         <div class="testi-card"><p class="testi-text">"Matched with Razorpay in 2 days. The AI knew what I wanted better than I did!"</p><div class="testi-author"><div class="testi-avatar">SR</div><div class="testi-author-info"><h5>Sravani Reddy</h5><p>CSE · JNTU Hyderabad</p></div></div></div>
-        <div class="testi-card"><p class="testi-text">"3 interview calls in the first week. One-click apply is a game changer."</p><div class="testi-author"><div class="testi-avatar">AS</div><div class="testi-author-info"><h5>Arjun Sharma</h5><p>ECE · IIT Bombay</p></div></div></div>
+        <div class="testi-card"><p class="testi-text">"3 interview calls in the first week. One-click apply is a game changer."</p><div class="testi-author"><div class="testi-avatar">AS</div><div class="testi-author-info"><h5>Arjun Ranga</h5><p>ECE · IIT Bombay</p></div></div></div>
         <div class="testi-card"><p class="testi-text">"Skill gap told me to learn Figma — two months later I landed CRED."</p><div class="testi-author"><div class="testi-avatar">MI</div><div class="testi-author-info"><h5>Meghana Iyer</h5><p>Design · NID Ahmedabad</p></div></div></div>
       </div>
     </div>
@@ -507,18 +508,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <div class="reg-wrap">
     <div class="reg-box">
       <div class="steps-indicator"><div class="step-dot active" id="sdot-1">1</div><div class="step-line" id="sline-1"></div><div class="step-dot" id="sdot-2">2</div><div class="step-line" id="sline-2"></div><div class="step-dot" id="sdot-3">3</div></div>
+      <div id="regError" style="display:none;background:#fee2e2;color:#b91c1c;padding:10px 14px;border-radius:8px;font-size:13px;font-weight:500;margin-bottom:14px;border:1px solid #fecaca;border-radius:8px"></div>
       <div class="reg-step active" id="rstep-1">
         <h2>Create your account</h2><p class="sub">Start your internship journey — free forever</p>
-        <div class="form-row"><div class="form-group"><label>First name</label><input type="text" placeholder="Priya"/></div><div class="form-group"><label>Last name</label><input type="text" placeholder="Sharma"/></div></div>
-        <div class="form-group"><label>Email</label><input type="email" placeholder="you@college.edu"/></div>
-        <div class="form-group"><label>Password</label><input type="password" placeholder="Min 8 characters"/></div>
-        <div class="form-group"><label>College / University</label><input type="text" placeholder="JNTU Hyderabad"/></div>
+        <div class="form-row"><div class="form-group"><label>First name</label><input id="regName" type="text" placeholder="Subhashini"/></div><div class="form-group"><label>Last name</label><input id="regLast" type="text" placeholder="Ranga"/></div></div>
+        <div class="form-group"><label>Email</label><input id="regEmail" type="email" placeholder="you@college.edu"/></div>
+        <div class="form-group"><label>Password</label><input id="regPass" type="password" placeholder="Min 6 characters"/></div>
+        <div class="form-group"><label>College / University</label><input id="regCollege" type="text" placeholder="JNTU Hyderabad"/></div>
         <div class="step-nav"><button class="btn btn-primary" style="flex:1" onclick="regStep(2)">Continue →</button></div>
         <p class="auth-switch">Already have an account? <a onclick="showPage('login')">Sign in</a></p>
       </div>
       <div class="reg-step" id="rstep-2">
         <h2>Tell us about yourself</h2><p class="sub">Helps our AI find the best matches for you</p>
-        <div class="form-group"><label>Degree &amp; Branch</label><select><option>B.Tech — Computer Science</option><option>B.Tech — Electronics</option><option>B.Tech — Mechanical</option><option>BCA</option><option>MBA</option><option>B.Des</option></select></div>
+        <div class="form-group"><label>Degree &amp; Branch</label><select><option>B.Tech — CSE (Data Science)</option><option>B.Tech — CSE (AI & ML)</option><option>B.Tech — CSE (Cyber Security)</option><option>B.Tech — Computer Science</option><option>B.Tech — Information Technology</option><option>B.Tech — Electronics & Communication</option><option>B.Tech — Mechanical</option><option>BCA — Data Science</option><option>BCA</option><option>B.Sc — Data Science</option><option>MBA</option><option>B.Des</option><option>MCA</option></select></div>
         <div class="form-row"><div class="form-group"><label>Year of Study</label><select><option>1st Year</option><option>2nd Year</option><option>3rd Year</option><option>4th Year</option></select></div><div class="form-group"><label>CGPA</label><input type="text" placeholder="8.5"/></div></div>
         <div class="form-group"><label>Your Skills (press Enter to add)</label><div class="tags-input-wrap" id="skillsWrap"><input class="tags-input" id="skillInput" placeholder="e.g. React, Python, Figma…"/></div></div>
         <div class="step-nav"><button class="btn btn-outline" onclick="regStep(1)">← Back</button><button class="btn btn-primary" style="flex:1" onclick="regStep(3)">Continue →</button></div>
@@ -527,7 +529,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <h2>Set your preferences</h2><p class="sub">We'll only show internships that match your goals</p>
         <div class="form-group"><label>Preferred Domains</label><div class="pref-grid"><div class="pref-option selected" onclick="togglePref(this)"><span class="icon">💻</span><span class="label">Software / Tech</span></div><div class="pref-option" onclick="togglePref(this)"><span class="icon">📊</span><span class="label">Data Science</span></div><div class="pref-option" onclick="togglePref(this)"><span class="icon">🎨</span><span class="label">Design / UI</span></div><div class="pref-option" onclick="togglePref(this)"><span class="icon">📣</span><span class="label">Marketing</span></div></div></div>
         <div class="range-group"><label>Minimum Stipend</label><div class="range-display" id="stipendDisplay">₹10,000 / month</div><input type="range" min="0" max="50000" step="2500" value="10000" oninput="updateStipend(this.value)"/></div>
-        <div class="step-nav"><button class="btn btn-outline" onclick="regStep(2)">← Back</button><button class="btn btn-primary" style="flex:1" onclick="showPage('dashboard')">Create my account 🚀</button></div>
+        <div class="step-nav"><button class="btn btn-outline" onclick="regStep(2)">← Back</button><button id="registerBtn" class="btn btn-primary" style="flex:1" onclick="doRegister()">Create my account 🚀</button></div>
       </div>
     </div>
   </div>
@@ -535,7 +537,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 
 <!-- ==================== DASHBOARD ==================== -->
 <div id="page-dashboard" class="page">
-  <nav><div class="nav-logo" onclick="showPage('landing')"><div class="logo-mark">IS</div><span>InternSetu</span></div><div class="nav-links"><a onclick="showPage('browse')">Browse</a><a href="#">👤 Priya</a></div></nav>
+  <nav><div class="nav-logo" onclick="showPage('landing')"><div class="logo-mark">IS</div><span>InternSetu</span></div><div class="nav-links"><a onclick="showPage('browse')">Browse</a><a class="user-nav-name" href="#">👤 User</a></div></nav>
   <div class="dash-layout">
     <div class="sidebar">
       <div class="sidebar-section">
@@ -552,11 +554,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="sidebar-section">
         <div class="sidebar-label">Account</div>
         <div class="sidebar-item"><span class="s-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></span>Settings</div>
-        <div class="sidebar-item" onclick="showPage('landing')"><span class="s-icon"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>Sign out</div>
+        <div class="sidebar-item" onclick="doLogout()"><span class="s-icon"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>Sign out</div>
       </div>
     </div>
     <div class="dash-main">
-      <div class="dash-header"><div><h2>Good morning, Priya ☀️</h2><p>3 new matches and 1 interview scheduled today</p></div><button class="btn btn-primary" onclick="showPage('browse')">Browse all →</button></div>
+      <div class="dash-header"><div><h2 class="dash-user-name">Good morning ☀️</h2><p>3 new matches and 1 interview scheduled today</p></div><button class="btn btn-primary" onclick="showPage('browse')">Browse all →</button></div>
       <div class="stats-grid">
         <div class="stat-card"><div class="s-icon-wrap"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div><div class="stat-val">94%</div><div class="stat-label">Avg Match Score</div><div class="stat-change up">↑ 6% this week</div></div>
         <div class="stat-card"><div class="s-icon-wrap"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div><div class="stat-val">12</div><div class="stat-label">New Matches</div><div class="stat-change up">↑ 3 today</div></div>
@@ -588,7 +590,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 
 <!-- ==================== BROWSE ==================== -->
 <div id="page-browse" class="page">
-  <nav><div class="nav-logo" onclick="showPage('landing')"><div class="logo-mark">IS</div><span>InternSetu</span></div><div class="nav-links"><a onclick="showPage('dashboard')">Dashboard</a><a href="#">👤 Priya</a></div></nav>
+  <nav><div class="nav-logo" onclick="showPage('landing')"><div class="logo-mark">IS</div><span>InternSetu</span></div><div class="nav-links"><a onclick="showPage('dashboard')">Dashboard</a><a class="user-nav-name" href="#">👤 Subhashini</a></div></nav>
   <div class="browse-layout">
     <div class="filter-sidebar">
       <h3>Filters <a onclick="clearFilters()">Clear all</a></h3>
@@ -618,7 +620,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div class="sidebar-item" onclick="showPage('dashboard')"><span class="s-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>Dashboard</div>
         <div class="sidebar-item" onclick="showPage('browse')"><span class="s-icon"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></span>Browse</div>
         <div class="sidebar-item active"><span class="s-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>My Profile</div>
-        <div class="sidebar-item" onclick="showPage('landing')"><span class="s-icon"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>Sign out</div>
+        <div class="sidebar-item" onclick="doLogout()"><span class="s-icon"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></span>Sign out</div>
       </div>
     </div>
     <div class="dash-main">
@@ -628,14 +630,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div style="position:relative;z-index:1;display:flex;align-items:flex-end;gap:20px;margin-bottom:20px;padding-top:60px">
           <div style="width:80px;height:80px;border-radius:20px;background:#fff;border:3px solid #fff;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:800;color:var(--blue);box-shadow:var(--shadow-md);flex-shrink:0">P</div>
           <div style="flex:1">
-            <h2 style="font-family:'Instrument Serif',serif;font-size:24px;font-weight:400;letter-spacing:-0.3px">Priya Sharma</h2>
+            <h2 style="font-family:'Instrument Serif',serif;font-size:24px;font-weight:400;letter-spacing:-0.3px">Subhashini Ranga</h2>
             <p style="font-size:14px;color:var(--gray);margin-top:2px">B.Tech CSE · IIIT Hyderabad · Final Year</p>
           </div>
           <button class="btn btn-outline" style="font-size:13px;padding:9px 18px" onclick="toggleEditMode()">✏️ Edit Profile</button>
         </div>
         <div style="display:flex;gap:32px;flex-wrap:wrap">
           <div style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--gray)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Hyderabad, India</div>
-          <div style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--gray)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>priya.sharma@students.iiit.ac.in</div>
+          <div style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--gray)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Subhashini.Ranga@students.iiit.ac.in</div>
           <div style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--gray)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Full Stack · Data Science</div>
           <div style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--green);font-weight:600"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Open to internships</div>
         </div>
@@ -729,8 +731,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
           <div class="dash-card">
             <h3>Links</h3>
             <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--gray-light);border-radius:9px;font-size:13px;cursor:pointer" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--gray-light)'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gray)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg><span style="flex:1;color:var(--navy)">github.com/priyasharma</span><span style="color:var(--blue);font-weight:600;font-size:12px">✓ Connected</span></div>
-              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--gray-light);border-radius:9px;font-size:13px;cursor:pointer" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--gray-light)'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gray)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg><span style="flex:1;color:var(--navy)">linkedin.com/in/priyasharma</span><span style="color:var(--blue);font-weight:600;font-size:12px">✓ Connected</span></div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--gray-light);border-radius:9px;font-size:13px;cursor:pointer" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--gray-light)'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gray)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg><span style="flex:1;color:var(--navy)">github.com/SubhashiniRanga</span><span style="color:var(--blue);font-weight:600;font-size:12px">✓ Connected</span></div>
+              <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border:1.5px solid var(--gray-light);border-radius:9px;font-size:13px;cursor:pointer" onmouseover="this.style.borderColor='var(--blue)'" onmouseout="this.style.borderColor='var(--gray-light)'"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--gray)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg><span style="flex:1;color:var(--navy)">linkedin.com/in/SubhashiniRanga</span><span style="color:var(--blue);font-weight:600;font-size:12px">✓ Connected</span></div>
               <button class="btn btn-outline" style="font-size:13px;padding:9px;width:100%">+ Add Portfolio Link</button>
             </div>
           </div>
@@ -863,15 +865,291 @@ document.addEventListener('mousemove',e=>{dot.style.left=e.clientX+'px';dot.styl
 function attachHover(root){(root||document).querySelectorAll('a,button,.intern-card,.feature-card,.sidebar-item,.filter-chip,.pref-option,.hm-card,.tl-card').forEach(el=>{el.addEventListener('mouseenter',()=>{ring.style.width='48px';ring.style.height='48px';ring.style.borderColor='rgba(36,97,232,.65)'});el.addEventListener('mouseleave',()=>{ring.style.width='32px';ring.style.height='32px';ring.style.borderColor='rgba(36,97,232,.45)'})});}
 attachHover();
 
+// ── AUTH STATE ──────────────────────────────────────
+let currentUser = null;
+function getToken(){ return localStorage.getItem('is_token'); }
+function setAuth(data){
+  localStorage.setItem('is_token', data.token);
+  localStorage.setItem('is_name', data.name);
+  localStorage.setItem('is_email', data.email || '');
+  currentUser = data;
+}
+function clearAuth(){ localStorage.removeItem('is_token'); localStorage.removeItem('is_name'); localStorage.removeItem('is_email'); currentUser = null; }
+function isLoggedIn(){ return !!getToken(); }
+
 function showPage(n){
+  if(['dashboard','browse','profile'].includes(n) && !getToken() && !currentUser){
+    showPage('login'); return;
+  }
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.getElementById('page-'+n).classList.add('active');
+  const pg = document.getElementById('page-'+n);
+  if(!pg) return;
+  pg.classList.add('active');
   window.scrollTo(0,0);
-  if(n==='browse')renderBrowseCards();
-  if(n==='dashboard')setTimeout(animateSkillBars,400);
-  if(n==='landing')setTimeout(animateCounters,500);
+  if(n==='browse') loadInternships();
+  if(n==='dashboard'){ setTimeout(animateSkillBars,400); loadDashboard(); }
+  if(n==='landing') setTimeout(animateCounters,500);
+  if(n==='login') resetAuthForms();
 }
 
+// ── API HELPERS ──────────────────────────────────────
+async function apiCall(url, method='GET', body=null){
+  const headers = {'Content-Type':'application/json'};
+  const token = getToken();
+  if(token) headers['Authorization'] = 'Bearer '+token;
+  const opts = {method, headers};
+  if(body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  return res;
+}
+
+function showAuthError(msg){
+  // Show on whichever error div is on the active page
+  ['authError','regError'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el && el.closest('.page.active')){ el.textContent = msg; el.style.display = 'block'; setTimeout(()=>el.style.display='none', 5000); }
+  });
+}
+
+// ── LOGIN ────────────────────────────────────────────
+async function doLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  if(!email || !pass){ showAuthError('Please fill all fields'); return; }
+  const btn = document.getElementById('loginBtn');
+  btn.textContent = 'Signing in…'; btn.disabled = true;
+  try {
+    const res = await apiCall('/api/login','POST',{email, password: pass});
+    const data = await res.json();
+    if(res.ok){
+      setAuth(data);
+      updateNavForUser(data.name);
+      btn.textContent = 'Sign in →'; btn.disabled = false;
+      showPage('dashboard');
+    } else {
+      showAuthError(data.message || 'Invalid email or password');
+      btn.textContent = 'Sign in →'; btn.disabled = false;
+    }
+  } catch(e){
+    // Flask not running — demo mode
+    const name = email.split('@')[0];
+    setAuth({token:'demo_token', name: name, email: email});
+    updateNavForUser(name);
+    btn.textContent = 'Sign in →'; btn.disabled = false;
+    showPage('dashboard');
+  }
+}
+
+// ── REGISTER ─────────────────────────────────────────
+function getSelectedDomains(){
+  const selected = [];
+  document.querySelectorAll('#rstep-3 .pref-option.selected .label').forEach(el=>selected.push(el.textContent));
+  return selected.join(', ');
+}
+function getSkillTags(){
+  const tags = [];
+  document.querySelectorAll('#skillsWrap .skill-tag-item').forEach(el=>{
+    const txt = el.childNodes[0].textContent.trim();
+    if(txt) tags.push(txt);
+  });
+  return tags;
+}
+
+async function doRegister(){
+  const name = document.getElementById('regName').value.trim();
+  const lastName = document.getElementById('regLast').value.trim();
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const college = document.getElementById('regCollege').value.trim();
+  const skills = getSkillTags();
+  const domain = getSelectedDomains();
+  if(!name || !email || !pass){ showAuthError('Please fill all required fields'); return; }
+  if(pass.length < 6){ showAuthError('Password must be at least 6 characters'); return; }
+  const btn = document.getElementById('registerBtn');
+  btn.textContent = 'Creating account…'; btn.disabled = true;
+  try {
+    const res = await apiCall('/api/register','POST',{
+      name: name+' '+lastName, email, password: pass, college, domain, skills
+    });
+    const data = await res.json();
+    if(res.ok){
+      // Auto-login after register
+      try {
+        const loginRes = await apiCall('/api/login','POST',{email, password: pass});
+        const loginData = await loginRes.json();
+        if(loginRes.ok){ setAuth(loginData); updateNavForUser(loginData.name); }
+        else { setAuth({token:'tk_'+Date.now(), name: name+' '+lastName, email}); updateNavForUser(name+' '+lastName); }
+      } catch(e2){
+        setAuth({token:'tk_'+Date.now(), name: name+' '+lastName, email}); updateNavForUser(name+' '+lastName);
+      }
+      btn.textContent = 'Create my account 🚀'; btn.disabled = false;
+      showPage('dashboard'); return;
+    } else {
+      showAuthError(data.message || 'Registration failed');
+      regStep(1);
+    }
+  } catch(e){
+    // Flask not running — demo mode
+    setAuth({token:'demo_token', name: name+' '+lastName, email: email});
+    updateNavForUser(name+' '+lastName);
+    btn.textContent = 'Create my account 🚀'; btn.disabled = false;
+    showPage('dashboard');
+    return;
+  }
+  btn.textContent = 'Create my account 🚀'; btn.disabled = false;
+}
+
+function updateNavForUser(name){
+  document.querySelectorAll('.user-nav-name').forEach(el=>el.textContent='👤 '+name);
+}
+
+function doLogout(){
+  clearAuth();
+  showPage('landing');
+}
+
+function resetAuthForms(){
+  document.getElementById('loginEmail').value = '';
+  document.getElementById('loginPass').value = '';
+  const err = document.getElementById('authError');
+  if(err) err.style.display = 'none';
+}
+
+// ── INTERNSHIPS — REAL API ────────────────────────────
+let browseData = [];
+
+async function loadInternships(filter=''){
+  const grid = document.getElementById('browseGrid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray)">Loading internships…</div>';
+  try {
+    const endpoint = isLoggedIn() ? '/api/internships/matched' : '/api/internships';
+    const res = await apiCall(endpoint);
+    if(res.ok){
+      browseData = await res.json();
+      renderBrowseCards(filter);
+    } else {
+      // fallback to static data
+      renderBrowseCards(filter, true);
+    }
+  } catch(e){
+    renderBrowseCards(filter, true);
+  }
+}
+
+const staticInternships=[
+  {id:'rzp1',company:'Razorpay',logo:'R',role:'Product Intern',loc:'Bangalore',location:'Bangalore',tags:['React','Node.js','Remote OK'],stipend:25000,match_score:94,deadline:'3 days',mode:'Remote OK'},
+  {id:'zmt1',company:'Zomato',logo:'Z',role:'Data Science Intern',loc:'Gurugram',location:'Gurugram',tags:['Python','ML','SQL'],stipend:30000,match_score:88,deadline:'5 days',mode:'Hybrid'},
+  {id:'crd1',company:'CRED',logo:'C',role:'UI/UX Design Intern',loc:'Bangalore',location:'Bangalore',tags:['Figma','Prototyping','Hybrid'],stipend:20000,match_score:91,deadline:'7 days',mode:'Hybrid'},
+  {id:'mes1',company:'Meesho',logo:'M',role:'SDE Intern',loc:'Bangalore',location:'Bangalore',tags:['Java','Spring Boot','On-site'],stipend:35000,match_score:82,deadline:'1 day',mode:'On-site'},
+  {id:'swg1',company:'Swiggy',logo:'S',role:'Backend Engineering',loc:'Bangalore',location:'Bangalore',tags:['Go','Kafka','Remote'],stipend:40000,match_score:79,deadline:'10 days',mode:'Remote'},
+  {id:'ntn1',company:'Notion',logo:'N',role:'Marketing Intern',loc:'Remote',location:'Remote',tags:['SEO','Content','Analytics'],stipend:15000,match_score:72,deadline:'8 days',mode:'Remote'},
+  {id:'grw1',company:'Groww',logo:'G',role:'Frontend Intern',loc:'Bangalore',location:'Bangalore',tags:['React','TypeScript','Hybrid'],stipend:28000,match_score:87,deadline:'4 days',mode:'Hybrid'},
+  {id:'ola1',company:'Ola',logo:'O',role:'ML Research Intern',loc:'Bangalore',location:'Bangalore',tags:['PyTorch','CV','On-site'],stipend:45000,match_score:76,deadline:'12 days',mode:'On-site'},
+  {id:'pep1',company:'PhonePe',logo:'P',role:'Product Analytics',loc:'Bangalore',location:'Bangalore',tags:['SQL','Tableau','Remote'],stipend:22000,match_score:84,deadline:'6 days',mode:'Remote'},
+  {id:'dnz1',company:'Dunzo',logo:'D',role:'Operations Intern',loc:'Mumbai',location:'Mumbai',tags:['Excel','Ops','On-site'],stipend:12000,match_score:68,deadline:'14 days',mode:'On-site'},
+  {id:'brs1',company:'BrowserStack',logo:'B',role:'QA Automation',loc:'Mumbai',location:'Mumbai',tags:['Selenium','Python','Hybrid'],stipend:18000,match_score:74,deadline:'9 days',mode:'Hybrid'},
+  {id:'frw1',company:'Freshworks',logo:'F',role:'SDE Intern',loc:'Chennai',location:'Chennai',tags:['Ruby','Rails','Remote'],stipend:32000,match_score:81,deadline:'5 days',mode:'Remote'},
+];
+
+function renderBrowseCards(filter='', useStatic=false){
+  const data = useStatic ? staticInternships : (browseData.length ? browseData : staticInternships);
+  const grid = document.getElementById('browseGrid');
+  const q = filter.toLowerCase();
+  const tagsFor = i => i.tags || (i.skills ? i.skills.slice(0,3) : []);
+  const filtered = data.filter(i=>!q||
+    (i.company||'').toLowerCase().includes(q)||
+    (i.role||'').toLowerCase().includes(q)||
+    tagsFor(i).some(t=>t.toLowerCase().includes(q))
+  );
+  document.getElementById('resultsCount').textContent=filtered.length+' internships found';
+  if(filtered.length===0){
+    grid.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><h3>No internships found</h3><p>Try a different search — "React", "Design", "Zomato"…</p></div>`;return;
+  }
+  grid.innerHTML=filtered.map(i=>{
+    const tags=tagsFor(i);
+    const match=i.match_score||i.match||70;
+    const loc=i.location||i.loc||'India';
+    const id=i.id||i.company.toLowerCase().slice(0,3)+'1';
+    return `<div class="intern-card" onclick="openDetail('${id}','${i.company}','${i.role}',${i.stipend},${match},'${loc}','${i.deadline}','${tags.join(',')}')">
+      <div class="ic-header"><div class="ic-company"><div class="ic-logo">${(i.logo||i.company[0])}</div><div class="ic-info"><h4>${i.company}</h4><p>${loc} · ${i.role}</p></div></div><div class="ic-match">${match}%</div></div>
+      <div class="ic-tags">${tags.map(t=>`<span class="ic-tag">${t}</span>`).join('')}</div>
+      <div class="ic-footer"><div class="ic-stipend">₹${i.stipend.toLocaleString('en-IN')} <span>/month</span></div>
+      <div style="display:flex;align-items:center;gap:9px"><div class="ic-deadline">⏰ ${i.deadline}</div>
+      <button class="btn btn-primary" style="padding:7px 15px;font-size:13px" onclick="event.stopPropagation();doApply('${id}','${i.company}')">Apply</button></div></div>
+    </div>`;
+  }).join('');
+  attachHover(grid);
+}
+
+function filterCards(){ renderBrowseCards(document.getElementById('searchInput').value, !browseData.length); }
+
+// ── APPLY ─────────────────────────────────────────────
+async function doApply(internId, company){
+  if(!isLoggedIn()){ showPage('login'); return; }
+  try {
+    const res = await apiCall(`/api/apply/${internId}`, 'POST');
+    const data = await res.json();
+    showToast(data.message || 'Applied to '+company+'!');
+  } catch(e){ showToast('Applied to '+company+'!'); }
+}
+
+// ── BOOKMARK ──────────────────────────────────────────
+async function doBookmark(internId){
+  if(!isLoggedIn()){ showPage('login'); return; }
+  try {
+    const res = await apiCall(`/api/bookmark/${internId}`, 'POST');
+    const data = await res.json();
+    return data.saved;
+  } catch(e){ return false; }
+}
+
+// ── DASHBOARD ─────────────────────────────────────────
+async function loadDashboard(){
+  const name = localStorage.getItem('is_name') || 'there';
+  document.querySelectorAll('.dash-user-name').forEach(el=>el.textContent='Good morning, '+name.split(' ')[0]+' ☀️');
+  // Load real applications
+  if(isLoggedIn()){
+    try {
+      const res = await apiCall('/api/applications');
+      if(res.ok){
+        const apps = await res.json();
+        const countEl = document.getElementById('dash-app-count');
+        if(countEl) countEl.textContent = apps.length;
+      }
+    } catch(e){}
+  }
+}
+
+// ── DETAIL PAGE ───────────────────────────────────────
+let currentDetailId = '';
+function openDetail(id,company,role,stipend,match,loc,deadline,tagsStr){
+  currentDetailId = id;
+  document.getElementById('detail-logo').textContent=company[0];
+  document.getElementById('detail-role').textContent=role;
+  document.getElementById('detail-company').textContent=company;
+  document.getElementById('detail-stipend').textContent='₹'+stipend.toLocaleString('en-IN');
+  document.getElementById('detail-match').textContent=match+'% match';
+  document.getElementById('detail-loc').innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${loc}`;
+  document.getElementById('detail-deadline').textContent='⏰ Closes in '+deadline;
+  const tags=tagsStr.split(',');
+  document.getElementById('detail-tags').innerHTML=tags.map(t=>`<span class="ic-tag" style="font-size:13px;padding:6px 12px">${t}</span>`).join('');
+  showPage('detail');
+}
+
+async function applyDetail(){
+  const co=document.getElementById('detail-company').textContent;
+  await doApply(currentDetailId, co);
+}
+
+let detailSaved=false;
+async function toggleSaveDetail(){
+  const saved = await doBookmark(currentDetailId);
+  detailSaved = saved !== undefined ? saved : !detailSaved;
+  document.getElementById('saveDetailBtn').textContent=detailSaved?'🔖 Saved!':'🔖 Save';
+  document.getElementById('saveDetailBtn').style.background=detailSaved?'var(--blue-light)':'';
+}
+
+// ── OTHER UTILS ───────────────────────────────────────
 const pc=document.getElementById('particles-container');
 for(let i=0;i<14;i++){const p=document.createElement('div');p.className='particle';const s=Math.random()*7+3;p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;bottom:-20px;animation-duration:${Math.random()*14+8}s;animation-delay:${Math.random()*10}s`;pc.appendChild(p)}
 
@@ -888,62 +1166,10 @@ function toggleChip(el){el.classList.toggle('active')}
 function clearFilters(){document.querySelectorAll('.filter-chip').forEach((c,i)=>c.classList.toggle('active',i===0))}
 function animateSkillBars(){document.querySelectorAll('.skill-fill').forEach(b=>{b.style.width=b.dataset.w+'%'})}
 
-function showToast(co){
+function showToast(msg){
   const t=document.getElementById('applyToast');
-  t.innerHTML=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0ea96e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Applied to ${co}!`;
+  t.innerHTML=`<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0ea96e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> ${msg}`;
   t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)
-}
-
-const internships=[
-  {company:'Razorpay',logo:'R',role:'Product Intern',loc:'Bangalore',tags:['React','Node.js','Remote OK'],stipend:25000,match:94,deadline:'3 days'},
-  {company:'Zomato',logo:'Z',role:'Data Science Intern',loc:'Gurugram',tags:['Python','ML','SQL'],stipend:30000,match:88,deadline:'5 days'},
-  {company:'CRED',logo:'C',role:'UI/UX Design Intern',loc:'Bangalore',tags:['Figma','Prototyping','Hybrid'],stipend:20000,match:91,deadline:'7 days'},
-  {company:'Meesho',logo:'M',role:'SDE Intern',loc:'Bangalore',tags:['Java','Spring Boot','On-site'],stipend:35000,match:82,deadline:'1 day'},
-  {company:'Swiggy',logo:'S',role:'Backend Engineering',loc:'Bangalore',tags:['Go','Kafka','Remote'],stipend:40000,match:79,deadline:'10 days'},
-  {company:'Notion',logo:'N',role:'Marketing Intern',loc:'Remote',tags:['SEO','Content','Analytics'],stipend:15000,match:72,deadline:'8 days'},
-  {company:'Groww',logo:'G',role:'Frontend Intern',loc:'Bangalore',tags:['React','TypeScript','Hybrid'],stipend:28000,match:87,deadline:'4 days'},
-  {company:'Ola',logo:'O',role:'ML Research Intern',loc:'Bangalore',tags:['PyTorch','CV','On-site'],stipend:45000,match:76,deadline:'12 days'},
-  {company:'PhonePe',logo:'P',role:'Product Analytics',loc:'Bangalore',tags:['SQL','Tableau','Remote'],stipend:22000,match:84,deadline:'6 days'},
-  {company:'Dunzo',logo:'D',role:'Operations Intern',loc:'Mumbai',tags:['Excel','Ops','On-site'],stipend:12000,match:68,deadline:'14 days'},
-  {company:'BrowserStack',logo:'B',role:'QA Automation',loc:'Mumbai',tags:['Selenium','Python','Hybrid'],stipend:18000,match:74,deadline:'9 days'},
-  {company:'Freshworks',logo:'F',role:'SDE Intern',loc:'Chennai',tags:['Ruby','Rails','Remote'],stipend:32000,match:81,deadline:'5 days'},
-];
-
-function renderBrowseCards(filter=''){
-  const grid=document.getElementById('browseGrid');
-  const q=filter.toLowerCase();
-  const filtered=internships.filter(i=>!q||i.company.toLowerCase().includes(q)||i.role.toLowerCase().includes(q)||i.tags.some(t=>t.toLowerCase().includes(q)));
-  document.getElementById('resultsCount').textContent=filtered.length+' internships found';
-  if(filtered.length===0){grid.innerHTML=`<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><h3>No internships found</h3><p>Try a different search — "React", "Design", "Zomato"…</p></div>`;return}
-  grid.innerHTML=filtered.map(i=>`<div class="intern-card" onclick="openDetail('${i.company}','${i.role}',${i.stipend},${i.match},'${i.loc}','${i.deadline}','${i.tags.join(',')}')"><div class="ic-header"><div class="ic-company"><div class="ic-logo">${i.logo}</div><div class="ic-info"><h4>${i.company}</h4><p>${i.loc} · ${i.role}</p></div></div><div class="ic-match">${i.match}%</div></div><div class="ic-tags">${i.tags.map(t=>`<span class="ic-tag">${t}</span>`).join('')}</div><div class="ic-footer"><div class="ic-stipend">₹${i.stipend.toLocaleString('en-IN')} <span>/month</span></div><div style="display:flex;align-items:center;gap:9px"><div class="ic-deadline">⏰ ${i.deadline}</div><button class="btn btn-primary" style="padding:7px 15px;font-size:13px" onclick="event.stopPropagation();showToast('${i.company}')">Apply</button></div></div></div>`).join('');
-  attachHover(grid);
-}
-
-function filterCards(){renderBrowseCards(document.getElementById('searchInput').value)}
-
-function openDetail(company,role,stipend,match,loc,deadline,tagsStr){
-  document.getElementById('detail-logo').textContent=company[0];
-  document.getElementById('detail-role').textContent=role;
-  document.getElementById('detail-company').textContent=company;
-  document.getElementById('detail-stipend').textContent='₹'+stipend.toLocaleString('en-IN');
-  document.getElementById('detail-match').textContent=match+'% match';
-  document.getElementById('detail-loc').innerHTML=`<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>${loc}`;
-  document.getElementById('detail-deadline').textContent='⏰ Closes in '+deadline;
-  const tags=tagsStr.split(',');
-  document.getElementById('detail-tags').innerHTML=tags.map(t=>`<span class="ic-tag" style="font-size:13px;padding:6px 12px">${t}</span>`).join('');
-  showPage('detail');
-}
-
-function applyDetail(){
-  const co=document.getElementById('detail-company').textContent;
-  showToast(co);
-}
-
-let detailSaved=false;
-function toggleSaveDetail(){
-  detailSaved=!detailSaved;
-  document.getElementById('saveDetailBtn').textContent=detailSaved?'🔖 Saved!':'🔖 Save';
-  document.getElementById('saveDetailBtn').style.background=detailSaved?'var(--blue-light)':'';
 }
 
 // Profile edit
@@ -969,12 +1195,27 @@ function addSkill(){
   inp.value='';
 }
 
-// Sidebar profile link
 document.querySelectorAll('.sidebar-item').forEach(item=>{
   if(item.textContent.trim()==='My Profile') item.onclick=()=>showPage('profile');
 });
 
 window.addEventListener('scroll',()=>{document.querySelectorAll('nav').forEach(n=>n.classList.toggle('scrolled',window.scrollY>10))});
+
+// On page load — check if already logged in
+if(isLoggedIn()){
+  const name = localStorage.getItem('is_name');
+  if(name) updateNavForUser(name);
+}
+
+// Auto-seed internships when Flask is running
+async function autoSeed(){
+  try {
+    const res = await fetch('/api/seed', {method:'POST', headers:{'Content-Type':'application/json'}});
+    if(res.ok){ const d = await res.json(); console.log('Seed:', d.message); }
+  } catch(e){ /* Flask not running, skip */ }
+}
+autoSeed();
 </script>
+
 </body>
 </html>
