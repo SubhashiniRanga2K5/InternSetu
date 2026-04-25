@@ -314,7 +314,7 @@ def send_deadline_notification():
             "personalizations": [{"to": [{"email": user['email']}]}],
             "from": {"email": "noreply@internsetu.app", "name": "InternSetu"},
             "subject": f"⏰ {len(closing_soon)} internship(s) closing soon!",
-            "content": [{"type": "text/plain", "value": f"Hi {user['name']},
+            "content": [{"type": "text/plain", "value": f"Hi {user['name']},\n\nThese internships are closing soon:\n" + "\n".join([f"• {i['company']} - {i['role']} ({i['deadline']} left)" for i in closing_soon]) + "\n\nApply now: https://internsetu-production.up.railway.app\n\nTeam InternSetu"}]
 
 These internships are closing soon:
 " + "
