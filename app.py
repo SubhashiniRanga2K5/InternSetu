@@ -107,26 +107,7 @@ def get_internships():
     internships = list(mongo.db.internships.find({}, {'_id': 0}))
     return jsonify(internships), 200
 
-@app.route('/api/internships/matched', methods=['GET'])
-@jwt_required()
-def get_matched():
-    uid = get_jwt_identity()
-    user = mongo.db.users.find_one({'_id': ObjectId(uid)})
-    user_skills = set(s.lower() for s in user.get('skills', []))
-    user_domain = user.get('domain', '').lower()
-    internships = list(mongo.db.internships.find({}, {'_id': 0}))
-    for intern in internships:
-        req_skills = set(s.lower() for s in intern.get('skills', []))
-        if req_skills:
-            matched = len(user_skills & req_skills)
-            score = int((matched / len(req_skills)) * 100)
-            if user_domain and user_domain in intern.get('domain', '').lower():
-                score = min(score + 15, 99)
-            intern['match_score'] = max(score, 30)
-        else:
-            intern['match_score'] = 50
-    internships.sort(key=lambda x: x['match_score'], reverse=True)
-    return jsonify(internships), 200
+# get_matched moved to enhanced version below
 
 # ── BOOKMARKS ───────────────────────────────────────────────
 @app.route('/api/bookmark/<intern_id>', methods=['POST'])
@@ -205,6 +186,185 @@ def seed():
     ]
     mongo.db.internships.insert_many(internships)
     return jsonify({'message': f'Seeded {len(internships)} internships!'}), 201
+
+
+# ── RESUME UPLOAD ────────────────────────────────────────────
+from flask import send_from_directory
+import base64
+
+@app.route('/api/resume/upload', methods=['POST'])
+@jwt_required()
+def upload_resume():
+    uid = get_jwt_identity()
+    data = request.get_json()
+    resume_name = data.get('resume_name', '')
+    resume_data = data.get('resume_data', '')  # base64
+    mongo.db.users.update_one(
+        {'_id': ObjectId(uid)},
+        {'$set': {'resume_name': resume_name, 'has_resume': True}}
+    )
+    return jsonify({'message': 'Resume saved!', 'name': resume_name}), 200
+
+# ── COMPANY AUTH ──────────────────────────────────────────────
+@app.route('/api/company/register', methods=['POST'])
+def company_register():
+    data = request.get_json()
+    name = data.get('name', '').strip()
+    email = data.get('email', '').strip().lower()
+    password = data.get('password', '')
+    company_name = data.get('company_name', '').strip()
+    if not all([name, email, password, company_name]):
+        return jsonify({'message': 'All fields required'}), 400
+    if mongo.db.companies.find_one({'email': email}):
+        return jsonify({'message': 'Email already registered'}), 409
+    hashed = bcrypt.generate_password_hash(password).decode('utf-8')
+    mongo.db.companies.insert_one({'name': name, 'email': email, 'password': hashed, 'company_name': company_name})
+    return jsonify({'message': 'Company registered!'}), 201
+
+@app.route('/api/company/login', methods=['POST'])
+def company_login():
+    data = request.get_json()
+    email = data.get('email', '').strip().lower()
+    password = data.get('password', '')
+    company = mongo.db.companies.find_one({'email': email})
+    if not company or not bcrypt.check_password_hash(company['password'], password):
+        return jsonify({'message': 'Invalid credentials'}), 401
+    token = create_access_token(identity='company_'+str(company['_id']))
+    return jsonify({'token': token, 'company_name': company['company_name'], 'name': company['name']}), 200
+
+@app.route('/api/company/post', methods=['POST'])
+@jwt_required()
+def post_internship():
+    uid = get_jwt_identity()
+    if not uid.startswith('company_'):
+        return jsonify({'message': 'Company login required'}), 403
+    data = request.get_json()
+    required = ['role', 'location', 'stipend', 'domain', 'skills', 'deadline']
+    if not all(data.get(f) for f in required):
+        return jsonify({'message': 'Fill all required fields'}), 400
+    company_id = uid.replace('company_', '')
+    company = mongo.db.companies.find_one({'_id': ObjectId(company_id)})
+    import random, string
+    new_id = ''.join(random.choices(string.ascii_lowercase+string.digits, k=6))
+    internship = {
+        'id': new_id,
+        'company': company['company_name'] if company else 'Company',
+        'logo': (company['company_name'][0] if company else 'C'),
+        'role': data['role'],
+        'location': data['location'],
+        'mode': data.get('mode', 'Hybrid'),
+        'stipend': int(data['stipend']),
+        'domain': data['domain'],
+        'skills': data['skills'] if isinstance(data['skills'], list) else data['skills'].split(','),
+        'deadline': data.get('deadline', '30 days'),
+        'tags': data['skills'][:3] if isinstance(data['skills'], list) else data['skills'].split(',')[:3],
+        'posted_by': company_id
+    }
+    mongo.db.internships.insert_one(internship)
+    return jsonify({'message': f'Internship posted!', 'id': new_id}), 201
+
+# ── ENHANCED AI MATCHING ──────────────────────────────────────
+@app.route('/api/internships/matched', methods=['GET'])
+@jwt_required()
+def get_matched():
+    uid = get_jwt_identity()
+    user = mongo.db.users.find_one({'_id': ObjectId(uid)})
+    user_skills = set(s.lower() for s in user.get('skills', []))
+    user_domain = user.get('domain', '').lower()
+    user_location = user.get('location', '').lower()
+    internships = list(mongo.db.internships.find({}, {'_id': 0}))
+    for intern in internships:
+        req_skills = set(s.lower() for s in intern.get('skills', []))
+        score = 30
+        # Skills (40%)
+        if req_skills:
+            matched = len(user_skills & req_skills)
+            score += int((matched / len(req_skills)) * 40)
+        # Domain (20%)
+        intern_domain = intern.get('domain', '').lower()
+        if user_domain and (user_domain in intern_domain or intern_domain in user_domain):
+            score += 20
+        # Location/Remote (10%)
+        if intern.get('mode') == 'Remote':
+            score += 10
+        elif user_location and user_location in intern.get('location', '').lower():
+            score += 10
+        intern['match_score'] = min(score, 99)
+    internships.sort(key=lambda x: x['match_score'], reverse=True)
+    return jsonify(internships), 200
+
+# ── EMAIL NOTIFICATIONS (SendGrid) ───────────────────────────
+@app.route('/api/notify/deadline', methods=['POST'])
+@jwt_required()
+def send_deadline_notification():
+    # Requires SENDGRID_API_KEY env var
+    sendgrid_key = os.environ.get('SENDGRID_API_KEY')
+    if not sendgrid_key:
+        return jsonify({'message': 'Email notifications not configured'}), 200
+    uid = get_jwt_identity()
+    user = mongo.db.users.find_one({'_id': ObjectId(uid)})
+    # Get internships closing in 3 days
+    internships = list(mongo.db.internships.find({}, {'_id': 0}))
+    closing_soon = [i for i in internships if '1 day' in i.get('deadline','') or '2 day' in i.get('deadline','') or '3 day' in i.get('deadline','')]
+    if not closing_soon:
+        return jsonify({'message': 'No deadlines soon!'}), 200
+    try:
+        import urllib.request, json as json_lib
+        email_data = {
+            "personalizations": [{"to": [{"email": user['email']}]}],
+            "from": {"email": "noreply@internsetu.app", "name": "InternSetu"},
+            "subject": f"⏰ {len(closing_soon)} internship(s) closing soon!",
+            "content": [{"type": "text/plain", "value": f"Hi {user['name']},
+
+These internships are closing soon:
+" + "
+".join([f"• {i['company']} - {i['role']} ({i['deadline']} left)" for i in closing_soon]) + "
+
+Apply now: https://internsetu-production.up.railway.app
+
+Team InternSetu"}]
+        }
+        req = urllib.request.Request('https://api.sendgrid.com/v3/mail/send',
+            data=json_lib.dumps(email_data).encode(),
+            headers={'Authorization': f'Bearer {sendgrid_key}', 'Content-Type': 'application/json'},
+            method='POST')
+        urllib.request.urlopen(req)
+        return jsonify({'message': f'Email sent to {user["email"]}!'}), 200
+    except Exception as e:
+        return jsonify({'message': 'Email failed: ' + str(e)}), 500
+
+# ── MANIFEST (PWA) ───────────────────────────────────────────
+@app.route('/manifest.json')
+def manifest():
+    return jsonify({
+        "name": "InternSetu",
+        "short_name": "InternSetu",
+        "description": "AI-powered internship matching platform",
+        "start_url": "/",
+        "display": "standalone",
+        "background_color": "#f8f9ff",
+        "theme_color": "#2461e8",
+        "icons": [
+            {"src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png"},
+            {"src": "/static/icon-512.png", "sizes": "512x512", "type": "image/png"}
+        ]
+    })
+
+# ── SERVICE WORKER (PWA) ─────────────────────────────────────
+@app.route('/sw.js')
+def service_worker():
+    sw_code = """
+const CACHE = 'internsetu-v1';
+const ASSETS = ['/', '/manifest.json'];
+self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS))));
+self.addEventListener('fetch', e => {
+  if(e.request.url.includes('/api/')) return;
+  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+});
+"""
+    from flask import Response
+    return Response(sw_code, mimetype='application/javascript')
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)

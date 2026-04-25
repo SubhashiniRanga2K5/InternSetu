@@ -890,6 +890,8 @@ function showPage(n){
   if(n==='dashboard'){ setTimeout(animateSkillBars,400); loadDashboard(); }
   if(n==='landing') setTimeout(animateCounters,500);
   if(n==='login') resetAuthForms();
+  if(n==='profile') setTimeout(restoreResumeName,200);
+  if(n==='interviews') setTimeout(loadInterviews,100);
 }
 
 // ── API HELPERS ──────────────────────────────────────
@@ -1081,7 +1083,7 @@ function renderBrowseCards(filter='', useStatic=false){
   attachHover(grid);
 }
 
-function filterCards(){ renderBrowseCards(document.getElementById('searchInput').value, !browseData.length); }
+function filterCards(){ applyAllFilters(); }
 
 // ── APPLY ─────────────────────────────────────────────
 async function doApply(internId, company){
@@ -1215,7 +1217,312 @@ async function autoSeed(){
   } catch(e){ /* Flask not running, skip */ }
 }
 autoSeed();
+
+// ── DARK MODE ──────────────────────────────────────────────
+function toggleDark(){
+  document.body.classList.toggle('dark-mode');
+  const btn = document.querySelector('.dark-toggle');
+  const isDark = document.body.classList.contains('dark-mode');
+  if(btn) btn.textContent = isDark ? '☀️' : '🌙';
+  localStorage.setItem('is_dark', isDark ? '1' : '0');
+}
+if(localStorage.getItem('is_dark')==='1'){
+  document.body.classList.add('dark-mode');
+  const btn = document.querySelector('.dark-toggle');
+  if(btn) btn.textContent = '☀️';
+}
+
+// ── SKELETON LOADING ────────────────────────────────────────
+function showSkeletons(gridId, count=6){
+  const grid = document.getElementById(gridId);
+  if(!grid) return;
+  grid.innerHTML = Array(count).fill(0).map(()=>`
+    <div class="skeleton-card">
+      <div style="display:flex;gap:12px;margin-bottom:14px">
+        <div class="skeleton sk-circle" style="width:42px;height:42px;flex-shrink:0"></div>
+        <div style="flex:1"><div class="skeleton sk-line"></div><div class="skeleton sk-line" style="width:60%"></div></div>
+      </div>
+      <div class="skeleton sk-line"></div><div class="skeleton sk-line" style="width:75%"></div>
+    </div>`).join('');
+}
+
+// ── REAL FILTER CHIPS ───────────────────────────────────────
+let activeFilters = {domain:'All', stipend:'Any', duration:'Any', location:'All India'};
+
+function toggleChip(el){
+  const section = el.closest('.filter-section');
+  const labelEl = section ? section.querySelector('label') : null;
+  const sectionName = labelEl ? labelEl.textContent.trim().toLowerCase() : '';
+  el.closest('.filter-chips').querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  if(sectionName.includes('domain')) activeFilters.domain = el.textContent;
+  else if(sectionName.includes('stipend')) activeFilters.stipend = el.textContent;
+  else if(sectionName.includes('duration')) activeFilters.duration = el.textContent;
+  else if(sectionName.includes('location')) activeFilters.location = el.textContent;
+  applyAllFilters();
+}
+
+function applyAllFilters(){
+  const q = (document.getElementById('searchInput')||{value:''}).value.toLowerCase();
+  const data = browseData.length ? browseData : staticInternships;
+  let filtered = data.filter(i=>{
+    const tags = i.tags||(i.skills||[]).slice(0,3);
+    if(q && !i.company.toLowerCase().includes(q) && !i.role.toLowerCase().includes(q) && !tags.some(t=>t.toLowerCase().includes(q))) return false;
+    if(activeFilters.domain !== 'All'){
+      const domainMap = {'Tech':'Full Stack|Frontend|Backend|Software','Data':'Data|ML|Machine','Design':'UI|UX|Design','Marketing':'Marketing'};
+      const pattern = domainMap[activeFilters.domain]||activeFilters.domain;
+      if(!new RegExp(pattern,'i').test(i.domain||i.role||'')) return false;
+    }
+    if(activeFilters.stipend !== 'Any'){
+      const minMap = {'₹5k+':5000,'₹10k+':10000,'₹20k+':20000,'₹30k+':30000};
+      const min = minMap[activeFilters.stipend];
+      if(min && i.stipend < min) return false;
+    }
+    const checkedModes = [];
+    document.querySelectorAll('.filter-checkbox input:checked').forEach((cb,idx)=>{checkedModes.push(['Remote','On-site','Hybrid'][idx]);});
+    if(checkedModes.length < 3){
+      const iMode = (i.mode||'').toLowerCase();
+      if(!checkedModes.some(m=>iMode.includes(m.toLowerCase()))) return false;
+    }
+    return true;
+  });
+  const grid = document.getElementById('browseGrid');
+  const countEl = document.getElementById('resultsCount');
+  if(countEl) countEl.textContent = filtered.length + ' internships found';
+  if(!filtered.length){
+    grid.innerHTML = '<div class="empty-state"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><h3>No internships found</h3><p>Try different filters</p></div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(i=>{
+    const tags = i.tags||(i.skills||[]).slice(0,3);
+    const match = i.match_score||i.match||70;
+    const loc = i.location||i.loc||'India';
+    const id = i.id||i.company.toLowerCase().slice(0,3)+'1';
+    return `<div class="intern-card" onclick="openDetail('${id}','${i.company}','${i.role}',${i.stipend},${match},'${loc}','${i.deadline}','${tags.join(',')}')">
+      <div class="ic-header"><div class="ic-company"><div class="ic-logo">${i.logo||i.company[0]}</div><div class="ic-info"><h4>${i.company}</h4><p>${loc} · ${i.role}</p></div></div><div class="ic-match">${match}%</div></div>
+      <div class="ic-tags">${tags.map(t=>`<span class="ic-tag">${t}</span>`).join('')}</div>
+      <div class="ic-footer"><div class="ic-stipend">₹${i.stipend.toLocaleString('en-IN')} <span>/month</span></div>
+      <div style="display:flex;align-items:center;gap:9px"><div class="ic-deadline">⏰ ${i.deadline}</div>
+      <button class="btn btn-primary" style="padding:7px 15px;font-size:13px" onclick="event.stopPropagation();doApply('${id}','${i.company}')">Apply</button></div></div>
+    </div>`;
+  }).join('');
+  attachHover(grid);
+}
+
+// ── RESUME UPLOAD ────────────────────────────────────────────
+function handleResumeUpload(file){
+  if(!file) return;
+  const label = document.getElementById('resumeLabel');
+  if(file.size > 5*1024*1024){ showToast('File too large! Max 5MB'); return; }
+  localStorage.setItem('is_resume', file.name);
+  if(label) label.innerHTML = `<strong>✅ ${file.name}</strong><br><span style="font-size:12px;color:var(--green)">Uploaded!</span>`;
+  showToast('Resume uploaded: ' + file.name);
+  try{ apiCall('/api/user/profile','PUT',{resume_name:file.name}); }catch(e){}
+}
+function handleResumeDrop(e){
+  e.preventDefault();
+  const dz = document.getElementById('resumeDropZone');
+  if(dz) dz.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if(file) handleResumeUpload(file);
+}
+function restoreResumeName(){
+  const name = localStorage.getItem('is_resume');
+  const label = document.getElementById('resumeLabel');
+  if(name && label) label.innerHTML = `<strong>✅ ${name}</strong><br><span style="font-size:12px;color:var(--green)">Resume uploaded</span>`;
+}
+
+// ── INTERVIEW SCHEDULER ──────────────────────────────────────
+function getInterviews(){ return JSON.parse(localStorage.getItem('is_interviews')||'[]'); }
+function saveInterviews(arr){ localStorage.setItem('is_interviews',JSON.stringify(arr)); }
+function showAddInterviewModal(){
+  const m = document.getElementById('interviewModal');
+  if(m){ m.style.display='flex'; const d = document.getElementById('iDate'); if(d) d.valueAsDate=new Date(); }
+}
+function closeInterviewModal(){ const m=document.getElementById('interviewModal'); if(m) m.style.display='none'; }
+function saveInterview(){
+  const company=document.getElementById('iCompany').value.trim();
+  const date=document.getElementById('iDate').value;
+  if(!company||!date){ showToast('Fill company and date!'); return; }
+  const arr=getInterviews();
+  arr.push({id:Date.now(),company,role:document.getElementById('iRole').value.trim(),date,time:document.getElementById('iTime').value,round:document.getElementById('iRound').value,notes:document.getElementById('iNotes').value.trim()});
+  arr.sort((a,b)=>new Date(a.date)-new Date(b.date));
+  saveInterviews(arr); closeInterviewModal(); loadInterviews(); showToast('Interview scheduled! 📅');
+}
+function deleteInterview(id){ saveInterviews(getInterviews().filter(i=>i.id!=id)); loadInterviews(); }
+function loadInterviews(){
+  const list=document.getElementById('interviewsList'); if(!list) return;
+  const arr=getInterviews();
+  if(!arr.length){ list.innerHTML=`<div class="dash-card" style="text-align:center;padding:48px"><div style="font-size:40px;margin-bottom:12px">📅</div><h3 style="font-size:17px;font-weight:600;margin-bottom:8px">No interviews scheduled</h3><p style="color:var(--gray);margin-bottom:20px">Got a call? Track it here!</p><button class="btn btn-primary" onclick="showAddInterviewModal()">+ Schedule Interview</button></div>`; return; }
+  const today=new Date().toISOString().split('T')[0];
+  list.innerHTML=arr.map(iv=>{
+    const d=new Date(iv.date); const day=d.getDate(); const mon=d.toLocaleString('default',{month:'short'});
+    const isToday=iv.date===today; const isPast=iv.date<today;
+    const badge=isToday?'<span class="badge-today">Today!</span>':isPast?'<span style="background:var(--gray-light);color:var(--gray);padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700">Done</span>':'<span class="badge-upcoming">Upcoming</span>';
+    return `<div class="interview-card"><div class="interview-date-box"><div class="day">${day}</div><div class="mon">${mon}</div></div><div style="flex:1"><div style="font-size:14px;font-weight:600">${iv.company}${iv.role?' — '+iv.role:''}</div><div style="font-size:12px;color:var(--gray);margin-top:3px">${iv.round}${iv.time?' · '+iv.time:''}</div>${iv.notes?`<div style="font-size:12px;color:var(--gray);margin-top:4px">📝 ${iv.notes}</div>`:''}</div>${badge}<button onclick="deleteInterview(${iv.id})" style="background:none;border:none;cursor:pointer;color:var(--gray);font-size:18px;padding:4px">🗑</button></div>`;
+  }).join('');
+}
+
+// ── PWA ──────────────────────────────────────────────────────
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); deferredPrompt=e;
+  const b=document.getElementById('pwaBanner');
+  if(b&&!localStorage.getItem('is_pwa_dismissed')) b.style.display='flex';
+});
+function installPWA(){
+  if(deferredPrompt){ deferredPrompt.prompt(); deferredPrompt.userChoice.then(r=>{ if(r.outcome==='accepted') showToast('InternSetu installed! 🎉'); document.getElementById('pwaBanner').style.display='none'; deferredPrompt=null; }); }
+}
+window.addEventListener('appinstalled',()=>showToast('Installed as app! 🎉'));
+
+// ── SERVICE WORKER ───────────────────────────────────────────
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
+
+// ── ENHANCED AI SCORING ──────────────────────────────────────
+function calcScore(userSkills, userDomain, intern){
+  let s=30;
+  const us=new Set(userSkills.map(x=>x.toLowerCase()));
+  const rs=new Set((intern.skills||[]).map(x=>x.toLowerCase()));
+  if(rs.size) s+=Math.round([...us].filter(x=>rs.has(x)).length/rs.size*40);
+  const ud=userDomain.toLowerCase(), id=(intern.domain||'').toLowerCase();
+  if(ud&&id&&(id.includes(ud)||ud.includes(id))) s+=20;
+  if((intern.mode||'').includes('Remote')) s+=10;
+  return Math.min(s,99);
+}
+
+// ── APPLICATIONS PAGE ─────────────────────────────
+const staticApps = [
+  {company:'Google',role:'STEP Intern',logo:'G',status:'Interview',date:'3 days ago'},
+  {company:'Flipkart',role:'SDE Intern',logo:'F',status:'Applied',date:'5 days ago'},
+  {company:'Swiggy',role:'Product Intern',logo:'S',status:'Applied',date:'7 days ago'},
+  {company:'BrowserStack',role:'QA Automation',logo:'B',status:'Rejected',date:'10 days ago'},
+];
+const statusClass = {Interview:'badge-interview',Applied:'badge-applied',Rejected:'badge-rejected',Offer:'badge-offer'};
+
+async function loadApplicationsPage(){
+  const list = document.getElementById('apps-list');
+  const subtitle = document.getElementById('apps-subtitle');
+  let apps = [];
+  try { const res = await apiCall('/api/applications'); if(res.ok) apps = await res.json(); } catch(e){}
+  if(!apps.length) apps = staticApps;
+  subtitle.textContent = apps.length + ' total applications';
+  const badge = document.getElementById('app-badge');
+  if(badge) badge.textContent = apps.length;
+  if(!apps.length){
+    list.innerHTML = `<div class="dash-card" style="text-align:center;padding:48px"><div style="font-size:40px;margin-bottom:12px">📄</div><h3 style="font-size:17px;font-weight:600;margin-bottom:8px">No applications yet</h3><p style="color:var(--gray);margin-bottom:20px">Browse internships and hit Apply!</p><button class="btn btn-primary" onclick="showPage('browse')">Browse now →</button></div>`;
+    return;
+  }
+  list.innerHTML = apps.map(a => `
+    <div class="app-full-card">
+      <div class="app-logo">${a.logo||a.company[0]}</div>
+      <div style="flex:1">
+        <div style="font-size:14px;font-weight:600">${a.role||'Intern'}</div>
+        <div style="font-size:12px;color:var(--gray);margin-top:2px">${a.company||'Company'} · Applied ${a.date||'recently'}</div>
+      </div>
+      <span class="status-badge ${statusClass[a.status]||'badge-applied'}">${a.status||'Applied'}</span>
+    </div>`).join('');
+}
+
+// ── SAVED PAGE ─────────────────────────────────────
+async function loadSavedPage(){
+  const grid = document.getElementById('saved-grid');
+  const subtitle = document.getElementById('saved-subtitle');
+  let saved = [];
+  try { const res = await apiCall('/api/bookmarks'); if(res.ok) saved = await res.json(); } catch(e){}
+  if(!saved.length){
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px"><div style="font-size:44px;margin-bottom:16px">🔖</div><h3 style="font-size:18px;font-weight:600;margin-bottom:8px">No saved internships yet</h3><p style="color:var(--gray);margin-bottom:20px">Hit the Save button on any internship card</p><button class="btn btn-primary" onclick="showPage('browse')">Browse Internships →</button></div>`;
+    subtitle.textContent = '0 saved roles'; return;
+  }
+  subtitle.textContent = saved.length + ' saved roles';
+  grid.innerHTML = saved.map(i=>{
+    const tags = i.tags||(i.skills||[]).slice(0,3);
+    return `<div class="intern-card" onclick="openDetail('${i.id}','${i.company}','${i.role}',${i.stipend},${i.match_score||75},'${i.location}','${i.deadline}','${tags.join(',')}')">
+      <div class="ic-header"><div class="ic-company"><div class="ic-logo">${i.logo||i.company[0]}</div><div class="ic-info"><h4>${i.company}</h4><p>${i.location} · ${i.role}</p></div></div><div class="ic-match">${i.match_score||75}%</div></div>
+      <div class="ic-tags">${tags.map(t=>`<span class="ic-tag">${t}</span>`).join('')}</div>
+      <div class="ic-footer"><div class="ic-stipend">₹${(i.stipend||0).toLocaleString('en-IN')} <span>/month</span></div>
+      <button class="btn btn-primary" style="padding:7px 15px;font-size:13px" onclick="event.stopPropagation();doApply('${i.id}','${i.company}')">Apply</button></div>
+    </div>`;
+  }).join('');
+  attachHover(grid);
+}
+
+// ── NOTIFICATIONS ──────────────────────────────────
+function markAllRead(){
+  document.querySelectorAll('.notif-dot.unread').forEach(d=>d.classList.replace('unread','read'));
+  document.querySelectorAll('.notif-count').forEach(el=>el.style.display='none');
+  showToast('All notifications marked as read!');
+}
+
+// ── COMPANY FORM ───────────────────────────────────
+function submitCompanyForm(){
+  showToast('Internship submitted! Goes live within 24 hours 🎉');
+}
+
+// ── "For Companies" link on landing nav ───────────
+document.querySelectorAll('a[href="#"]').forEach(a=>{
+  if(a.textContent.trim()==='For Companies') a.onclick=()=>showPage('company');
+});
+
+// ── NOTIFICATION BELL on dashboard nav ────────────
+// Add bell to dashboard nav
+const dashNav = document.querySelector('#page-dashboard nav .nav-links');
+if(dashNav){
+  const bell = document.createElement('span');
+  bell.className='notif-bell';
+  bell.innerHTML='🔔<span class="notif-count">3</span>';
+  bell.onclick=()=>showPage('notifications');
+  dashNav.insertBefore(bell, dashNav.firstChild);
+}
+
+// ── PATCH showPage for all new pages ──────────────
+const _orig = window.showPage;
+window.showPage = function(n){
+  const newPages = ['applications','saved','skillgap','notifications','company'];
+  if(newPages.includes(n) && !getToken() && !currentUser && n!=='company'){
+    _orig('login'); return;
+  }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg = document.getElementById('page-'+n);
+  if(pg){
+    pg.classList.add('active');
+    window.scrollTo(0,0);
+    const name = localStorage.getItem('is_name');
+    if(name) updateNavForUser(name);
+    if(n==='applications') loadApplicationsPage();
+    if(n==='saved') loadSavedPage();
+  } else {
+    _orig(n);
+  }
+};
+
+// ── PROFILE: save about + skills to DB ────────────
+const _origSaveAbout = window.saveAbout;
+window.saveAbout = async function(){
+  const text = document.getElementById('aboutText').value;
+  document.getElementById('aboutView').innerHTML=`<p style="font-size:14px;color:var(--gray);line-height:1.75">${text}</p>`;
+  toggleEditMode();
+  try{ await apiCall('/api/user/profile','PUT',{about:text}); showToast('Profile saved!'); }catch(e){ showToast('Saved!'); }
+};
+
+const _origAddSkill = window.addSkill;
+window.addSkill = async function(){
+  const inp = document.getElementById('newSkill');
+  const val = inp.value.trim();
+  if(!val) return;
+  const wrap = inp.parentElement.previousElementSibling;
+  const tag = document.createElement('span');
+  tag.style.cssText='background:var(--blue-light);color:var(--blue);padding:5px 13px;border-radius:7px;font-size:13px;font-weight:600;border:1px solid var(--blue-mid)';
+  tag.textContent = val;
+  wrap.appendChild(tag);
+  inp.value = '';
+  const allSkills = [...wrap.querySelectorAll('span')].map(s=>s.textContent.trim()).filter(Boolean);
+  try{ await apiCall('/api/user/profile','PUT',{skills:allSkills}); }catch(e){}
+  showToast('Skill added & saved!');
+};
+
+// [script continues below]
 </script>
+
 
 <!-- ============ STYLES FOR NEW PAGES ============ -->
 <style>
@@ -1552,136 +1859,5 @@ autoSeed();
   </div>
 </div>
 
-<script>
-// ── APPLICATIONS PAGE ─────────────────────────────
-const staticApps = [
-  {company:'Google',role:'STEP Intern',logo:'G',status:'Interview',date:'3 days ago'},
-  {company:'Flipkart',role:'SDE Intern',logo:'F',status:'Applied',date:'5 days ago'},
-  {company:'Swiggy',role:'Product Intern',logo:'S',status:'Applied',date:'7 days ago'},
-  {company:'BrowserStack',role:'QA Automation',logo:'B',status:'Rejected',date:'10 days ago'},
-];
-const statusClass = {Interview:'badge-interview',Applied:'badge-applied',Rejected:'badge-rejected',Offer:'badge-offer'};
-
-async function loadApplicationsPage(){
-  const list = document.getElementById('apps-list');
-  const subtitle = document.getElementById('apps-subtitle');
-  let apps = [];
-  try { const res = await apiCall('/api/applications'); if(res.ok) apps = await res.json(); } catch(e){}
-  if(!apps.length) apps = staticApps;
-  subtitle.textContent = apps.length + ' total applications';
-  const badge = document.getElementById('app-badge');
-  if(badge) badge.textContent = apps.length;
-  if(!apps.length){
-    list.innerHTML = `<div class="dash-card" style="text-align:center;padding:48px"><div style="font-size:40px;margin-bottom:12px">📄</div><h3 style="font-size:17px;font-weight:600;margin-bottom:8px">No applications yet</h3><p style="color:var(--gray);margin-bottom:20px">Browse internships and hit Apply!</p><button class="btn btn-primary" onclick="showPage('browse')">Browse now →</button></div>`;
-    return;
-  }
-  list.innerHTML = apps.map(a => `
-    <div class="app-full-card">
-      <div class="app-logo">${a.logo||a.company[0]}</div>
-      <div style="flex:1">
-        <div style="font-size:14px;font-weight:600">${a.role||'Intern'}</div>
-        <div style="font-size:12px;color:var(--gray);margin-top:2px">${a.company||'Company'} · Applied ${a.date||'recently'}</div>
-      </div>
-      <span class="status-badge ${statusClass[a.status]||'badge-applied'}">${a.status||'Applied'}</span>
-    </div>`).join('');
-}
-
-// ── SAVED PAGE ─────────────────────────────────────
-async function loadSavedPage(){
-  const grid = document.getElementById('saved-grid');
-  const subtitle = document.getElementById('saved-subtitle');
-  let saved = [];
-  try { const res = await apiCall('/api/bookmarks'); if(res.ok) saved = await res.json(); } catch(e){}
-  if(!saved.length){
-    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px"><div style="font-size:44px;margin-bottom:16px">🔖</div><h3 style="font-size:18px;font-weight:600;margin-bottom:8px">No saved internships yet</h3><p style="color:var(--gray);margin-bottom:20px">Hit the Save button on any internship card</p><button class="btn btn-primary" onclick="showPage('browse')">Browse Internships →</button></div>`;
-    subtitle.textContent = '0 saved roles'; return;
-  }
-  subtitle.textContent = saved.length + ' saved roles';
-  grid.innerHTML = saved.map(i=>{
-    const tags = i.tags||(i.skills||[]).slice(0,3);
-    return `<div class="intern-card" onclick="openDetail('${i.id}','${i.company}','${i.role}',${i.stipend},${i.match_score||75},'${i.location}','${i.deadline}','${tags.join(',')}')">
-      <div class="ic-header"><div class="ic-company"><div class="ic-logo">${i.logo||i.company[0]}</div><div class="ic-info"><h4>${i.company}</h4><p>${i.location} · ${i.role}</p></div></div><div class="ic-match">${i.match_score||75}%</div></div>
-      <div class="ic-tags">${tags.map(t=>`<span class="ic-tag">${t}</span>`).join('')}</div>
-      <div class="ic-footer"><div class="ic-stipend">₹${(i.stipend||0).toLocaleString('en-IN')} <span>/month</span></div>
-      <button class="btn btn-primary" style="padding:7px 15px;font-size:13px" onclick="event.stopPropagation();doApply('${i.id}','${i.company}')">Apply</button></div>
-    </div>`;
-  }).join('');
-  attachHover(grid);
-}
-
-// ── NOTIFICATIONS ──────────────────────────────────
-function markAllRead(){
-  document.querySelectorAll('.notif-dot.unread').forEach(d=>d.classList.replace('unread','read'));
-  document.querySelectorAll('.notif-count').forEach(el=>el.style.display='none');
-  showToast('All notifications marked as read!');
-}
-
-// ── COMPANY FORM ───────────────────────────────────
-function submitCompanyForm(){
-  showToast('Internship submitted! Goes live within 24 hours 🎉');
-}
-
-// ── "For Companies" link on landing nav ───────────
-document.querySelectorAll('a[href="#"]').forEach(a=>{
-  if(a.textContent.trim()==='For Companies') a.onclick=()=>showPage('company');
-});
-
-// ── NOTIFICATION BELL on dashboard nav ────────────
-// Add bell to dashboard nav
-const dashNav = document.querySelector('#page-dashboard nav .nav-links');
-if(dashNav){
-  const bell = document.createElement('span');
-  bell.className='notif-bell';
-  bell.innerHTML='🔔<span class="notif-count">3</span>';
-  bell.onclick=()=>showPage('notifications');
-  dashNav.insertBefore(bell, dashNav.firstChild);
-}
-
-// ── PATCH showPage for all new pages ──────────────
-const _orig = window.showPage;
-window.showPage = function(n){
-  const newPages = ['applications','saved','skillgap','notifications','company'];
-  if(newPages.includes(n) && !getToken() && !currentUser && n!=='company'){
-    _orig('login'); return;
-  }
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  const pg = document.getElementById('page-'+n);
-  if(pg){
-    pg.classList.add('active');
-    window.scrollTo(0,0);
-    const name = localStorage.getItem('is_name');
-    if(name) updateNavForUser(name);
-    if(n==='applications') loadApplicationsPage();
-    if(n==='saved') loadSavedPage();
-  } else {
-    _orig(n);
-  }
-};
-
-// ── PROFILE: save about + skills to DB ────────────
-const _origSaveAbout = window.saveAbout;
-window.saveAbout = async function(){
-  const text = document.getElementById('aboutText').value;
-  document.getElementById('aboutView').innerHTML=`<p style="font-size:14px;color:var(--gray);line-height:1.75">${text}</p>`;
-  toggleEditMode();
-  try{ await apiCall('/api/user/profile','PUT',{about:text}); showToast('Profile saved!'); }catch(e){ showToast('Saved!'); }
-};
-
-const _origAddSkill = window.addSkill;
-window.addSkill = async function(){
-  const inp = document.getElementById('newSkill');
-  const val = inp.value.trim();
-  if(!val) return;
-  const wrap = inp.parentElement.previousElementSibling;
-  const tag = document.createElement('span');
-  tag.style.cssText='background:var(--blue-light);color:var(--blue);padding:5px 13px;border-radius:7px;font-size:13px;font-weight:600;border:1px solid var(--blue-mid)';
-  tag.textContent = val;
-  wrap.appendChild(tag);
-  inp.value = '';
-  const allSkills = [...wrap.querySelectorAll('span')].map(s=>s.textContent.trim()).filter(Boolean);
-  try{ await apiCall('/api/user/profile','PUT',{skills:allSkills}); }catch(e){}
-  showToast('Skill added & saved!');
-};
-</script>
 </body>
 </html>
