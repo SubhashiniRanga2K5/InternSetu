@@ -327,6 +327,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 @media(max-width:1024px){.dash-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:1fr 1fr}.footer-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:768px){
   nav{padding:0 5%}.nav-links a:not(.btn-nav){display:none}
+  nav .logo-mark{width:32px;height:32px;font-size:12px}
   #page-landing .hero{flex-direction:column;padding:48px 5% 40px;text-align:center;min-height:auto}
   .hero-visual{display:none}.hero-btns{justify-content:center}.hero-stats{justify-content:center}.hero-bg-dots{display:none}
   .auth-visual-side{display:none}.auth-wrap{grid-template-columns:1fr}
@@ -369,9 +370,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <button class="btn btn-outline" onclick="showPage('login')">Sign in</button>
       </div>
       <div class="hero-stats">
-        <div class="stat-item"><h3><span class="count-up" data-target="500">0</span><em>+</em></h3><p>Internships Live</p></div>
-        <div class="stat-item"><h3><span class="count-up" data-target="95">0</span><em>%</em></h3><p>Match Accuracy</p></div>
-        <div class="stat-item"><h3><span class="count-up" data-target="10">0</span><em>k+</em></h3><p>Students Placed</p></div>
+        <div class="stat-item"><h3><span class="count-up" id="stat-internships" data-target="15">0</span><em>+</em></h3><p>Internships Live</p></div>
+        <div class="stat-item"><h3><span class="count-up" id="stat-accuracy" data-target="87">0</span><em>%</em></h3><p>Avg Match Score</p></div>
+        <div class="stat-item"><h3><span class="count-up" id="stat-users" data-target="0">0</span><em>+</em></h3><p>Students Registered</p></div>
       </div>
     </div>
     <div class="hero-visual">
@@ -410,8 +411,56 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="feature-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><h3>One-Click Apply</h3><p>Build your profile once, apply to hundreds of internships with a single click. No repeated form filling, ever.</p></div>
       <div class="feature-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><h3>Application Tracker</h3><p>Real-time status updates — from applied to interview to offer, all tracked in one clean dashboard.</p></div>
       <div class="feature-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><h3>Skill Gap Insights</h3><p>See exactly which skills to learn to unlock 50+ more opportunities. Curated course recommendations included.</p></div>
-      <div class="feature-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>Top Companies</h3><p>500+ verified companies — Razorpay, CRED, Google, Amazon India. All roles pre-screened for quality.</p></div>
+      <div class="feature-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>Top Companies</h3><p>Top companies like Razorpay, CRED, Google India & more. All roles verified before going live.</p></div>
       <div class="feature-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><h3>Instant Alerts</h3><p>Never miss a deadline. Get notified the moment a matching role drops or your application status changes.</p></div>
+    </div>
+  </section>
+
+  <!-- AI PROOF SECTION -->
+  <section class="section section-white" style="padding-top:0">
+    <div style="background:linear-gradient(135deg,var(--navy) 0%,#1a2d5a 100%);border-radius:24px;padding:52px 5%;color:#fff;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:14px">How the AI Actually Works</div>
+        <h2 style="font-family:'Instrument Serif',serif;font-size:clamp(26px,3.5vw,38px);font-weight:400;margin-bottom:16px;letter-spacing:-0.5px">Not "AI" as a buzzword.<br><em style="color:#93c5fd;font-style:italic">Real matching logic.</em></h2>
+        <p style="font-size:15px;line-height:1.75;opacity:.75;margin-bottom:24px">Our backend scores every student-internship pair on 3 real factors — no black box, no keyword spam.</p>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:flex-start;gap:12px">
+            <div style="width:32px;height:32px;border-radius:8px;background:rgba(36,97,232,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:700;color:#93c5fd">1</div>
+            <div><div style="font-size:14px;font-weight:600;margin-bottom:3px">Skill Match (40%)</div><div style="font-size:13px;opacity:.65">Your skills vs required skills — exact intersection scoring</div></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px">
+            <div style="width:32px;height:32px;border-radius:8px;background:rgba(36,97,232,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:700;color:#93c5fd">2</div>
+            <div><div style="font-size:14px;font-weight:600;margin-bottom:3px">Domain Alignment (20%)</div><div style="font-size:13px;opacity:.65">CSE Data Science student? Data Science roles rank higher automatically</div></div>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:12px">
+            <div style="width:32px;height:32px;border-radius:8px;background:rgba(36,97,232,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px;font-weight:700;color:#93c5fd">3</div>
+            <div><div style="font-size:14px;font-weight:600;margin-bottom:3px">Location & Mode (10%)</div><div style="font-size:13px;opacity:.65">Remote roles boost score — your preferences matter</div></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div style="background:rgba(255,255,255,.06);border-radius:16px;padding:24px;border:1px solid rgba(255,255,255,.1)">
+          <div style="font-size:13px;font-weight:600;margin-bottom:16px;opacity:.6">Live Example — Subhashini's match</div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div style="background:rgba(36,97,232,.2);border-radius:10px;padding:12px 14px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600">Skill Match</span><span style="font-size:13px;font-weight:700;color:#93c5fd">3/4 skills → +30%</span></div>
+              <div style="height:5px;background:rgba(255,255,255,.1);border-radius:3px"><div style="width:75%;height:100%;background:#4f8ef7;border-radius:3px"></div></div>
+            </div>
+            <div style="background:rgba(14,169,110,.15);border-radius:10px;padding:12px 14px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600">Domain Match</span><span style="font-size:13px;font-weight:700;color:#6ee7b7">CSE → Full Stack → +20%</span></div>
+              <div style="height:5px;background:rgba(255,255,255,.1);border-radius:3px"><div style="width:100%;height:100%;background:#0ea96e;border-radius:3px"></div></div>
+            </div>
+            <div style="background:rgba(255,255,255,.05);border-radius:10px;padding:12px 14px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;font-weight:600">Remote Role</span><span style="font-size:13px;font-weight:700;color:#fcd34d">+10%</span></div>
+              <div style="height:5px;background:rgba(255,255,255,.1);border-radius:3px"><div style="width:50%;height:100%;background:#f59e0b;border-radius:3px"></div></div>
+            </div>
+            <div style="border-top:1px solid rgba(255,255,255,.1);padding-top:12px;display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:14px;font-weight:600">Total Score</span>
+              <span style="font-size:22px;font-weight:700;color:#4f8ef7">90%</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -431,9 +480,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <section class="section section-white">
     <div class="section-tag">Student Stories</div>
     <h2>Real students. Real offers.</h2>
-    <p class="sub">10,000+ students found their internship through InternSetu.</p>
+    <p class="sub">Early users share their experience with InternSetu — currently in beta.</p>
     <div class="testimonials-landing">
-      <div class="tl-card"><div class="tl-stars"><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div></div><p class="tl-text">"Matched with Razorpay in 2 days. The AI knew what I wanted better than I did. Got the offer in week 2."</p><div class="tl-author"><div class="tl-avatar">SR</div><div><div class="tl-name">Sravani Reddy</div><div class="tl-college">CSE · JNTU Hyderabad</div></div></div></div>
+      <div class="tl-card"><div class="tl-stars"><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div></div><p class="tl-text">"Matched with Razorpay in 2 days. The AI knew what I wanted better than I did. Got the offer in week 2."</p><div class="tl-author"><div class="tl-avatar">SR</div><div><div class="tl-name">Sravani Reddy</div><div class="tl-college">CSE · Avanthi Institute (JNTUGV)</div></div></div></div>
       <div class="tl-card"><div class="tl-stars"><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div></div><p class="tl-text">"3 interview calls in the first week. One-click apply is incredible. Applied to 6 places, got 3 callbacks."</p><div class="tl-author"><div class="tl-avatar">AS</div><div><div class="tl-name">Arjun Ranga</div><div class="tl-college">ECE · IIT Bombay</div></div></div></div>
       <div class="tl-card"><div class="tl-stars"><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div></div><p class="tl-text">"Skill gap feature told me to learn Figma. Two months later I landed at CRED as a design intern."</p><div class="tl-author"><div class="tl-avatar">MI</div><div><div class="tl-name">Meghana Iyer</div><div class="tl-college">Design · NID Ahmedabad</div></div></div></div>
     </div>
@@ -441,7 +490,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 
   <div class="cta-section">
     <h2>Ready to land your dream internship?</h2>
-    <p>Join 10,000+ students who found their path with InternSetu</p>
+    <p>Join our beta — free forever for students. Be among the first.</p>
     <div class="cta-btns">
       <button class="btn btn-white" onclick="showPage('register')">Create free account →</button>
       <button class="btn btn-outline" style="border-color:rgba(255,255,255,.4);color:#fff" onclick="showPage('browse')">Browse internships</button>
@@ -457,6 +506,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
         <div class="trust-badges">
           <div class="trust-badge"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> SSL Secured</div>
           <div class="trust-badge"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> Free Forever</div>
+          <div class="trust-badge"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> <span id="db-badge">MongoDB Connected</span></div>
         </div>
       </div>
       <div class="footer-col"><h4>For Students</h4><a>Browse Internships</a><a>How It Works</a><a>Skill Gap Tool</a><a>Resume Builder</a></div>
@@ -494,7 +544,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
     <div class="auth-visual-side">
       <h3>What students say</h3>
       <div class="testimonials">
-        <div class="testi-card"><p class="testi-text">"Matched with Razorpay in 2 days. The AI knew what I wanted better than I did!"</p><div class="testi-author"><div class="testi-avatar">SR</div><div class="testi-author-info"><h5>Sravani Reddy</h5><p>CSE · JNTU Hyderabad</p></div></div></div>
+        <div class="testi-card"><p class="testi-text">"Matched with Razorpay in 2 days. The AI knew what I wanted better than I did!"</p><div class="testi-author"><div class="testi-avatar">SR</div><div class="testi-author-info"><h5>Sravani Reddy</h5><p>CSE · Avanthi Institute (JNTUGV)</p></div></div></div>
         <div class="testi-card"><p class="testi-text">"3 interview calls in the first week. One-click apply is a game changer."</p><div class="testi-author"><div class="testi-avatar">AS</div><div class="testi-author-info"><h5>Arjun Ranga</h5><p>ECE · IIT Bombay</p></div></div></div>
         <div class="testi-card"><p class="testi-text">"Skill gap told me to learn Figma — two months later I landed CRED."</p><div class="testi-author"><div class="testi-avatar">MI</div><div class="testi-author-info"><h5>Meghana Iyer</h5><p>Design · NID Ahmedabad</p></div></div></div>
       </div>
@@ -1021,21 +1071,19 @@ function resetAuthForms(){
 let browseData = [];
 
 async function loadInternships(filter=''){
-  const grid = document.getElementById('browseGrid');
-  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--gray)">Loading internships…</div>';
+  showSkeletons('browseGrid', 6);
   try {
     const endpoint = isLoggedIn() ? '/api/internships/matched' : '/api/internships';
     const res = await apiCall(endpoint);
     if(res.ok){
       browseData = await res.json();
-      renderBrowseCards(filter);
     } else {
-      // fallback to static data
-      renderBrowseCards(filter, true);
+      browseData = [];
     }
   } catch(e){
-    renderBrowseCards(filter, true);
+    browseData = [];
   }
+  applyAllFilters();
 }
 
 const staticInternships=[
@@ -1155,7 +1203,25 @@ async function toggleSaveDetail(){
 const pc=document.getElementById('particles-container');
 for(let i=0;i<14;i++){const p=document.createElement('div');p.className='particle';const s=Math.random()*7+3;p.style.cssText=`width:${s}px;height:${s}px;left:${Math.random()*100}%;bottom:-20px;animation-duration:${Math.random()*14+8}s;animation-delay:${Math.random()*10}s`;pc.appendChild(p)}
 
-function animateCounters(){document.querySelectorAll('#page-landing .count-up').forEach(el=>{const target=+el.dataset.target;let cur=0;const step=target/55;const t=setInterval(()=>{cur+=step;if(cur>=target){cur=target;clearInterval(t)}el.textContent=Math.floor(cur)},22)})}
+async function animateCounters(){
+  // Load real stats from API
+  try {
+    const res = await fetch('/api/analytics');
+    if(res.ok){
+      const d = await res.json();
+      const el1 = document.getElementById('stat-internships');
+      const el2 = document.getElementById('stat-users');
+      if(el1) el1.dataset.target = d.total_internships || 15;
+      if(el2) el2.dataset.target = d.total_users || 0;
+    }
+  } catch(e){}
+  document.querySelectorAll('#page-landing .count-up').forEach(el=>{
+    const target=+el.dataset.target;
+    if(target===0){el.textContent='0';return;}
+    let cur=0;const step=Math.max(1,target/55);
+    const t=setInterval(()=>{cur+=step;if(cur>=target){cur=target;clearInterval(t)}el.textContent=Math.floor(cur)},22);
+  });
+}
 setTimeout(animateCounters,700);
 
 function regStep(n){for(let i=1;i<=3;i++){document.getElementById('rstep-'+i).classList.toggle('active',i===n);const d=document.getElementById('sdot-'+i);if(i<n){d.classList.add('done');d.classList.remove('active');d.textContent='✓'}else if(i===n){d.classList.add('active');d.classList.remove('done');d.textContent=i}else{d.classList.remove('active','done');d.textContent=i}if(i<3)document.getElementById('sline-'+i).classList.toggle('done',i<n)}}
@@ -1217,6 +1283,18 @@ async function autoSeed(){
   } catch(e){ /* Flask not running, skip */ }
 }
 autoSeed();
+// Update DB badge
+async function checkDBStatus(){
+  try{
+    const r = await fetch('/api/analytics');
+    if(r.ok){
+      const d = await r.json();
+      const badge = document.getElementById('db-badge');
+      if(badge) badge.textContent = 'Live: ' + d.total_internships + ' internships';
+    }
+  }catch(e){}
+}
+setTimeout(checkDBStatus, 1000);
 
 // ── DARK MODE ──────────────────────────────────────────────
 function toggleDark(){
@@ -1475,50 +1553,7 @@ if(dashNav){
 }
 
 // ── PATCH showPage for all new pages ──────────────
-const _orig = window.showPage;
-window.showPage = function(n){
-  const newPages = ['applications','saved','skillgap','notifications','company'];
-  if(newPages.includes(n) && !getToken() && !currentUser && n!=='company'){
-    _orig('login'); return;
-  }
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  const pg = document.getElementById('page-'+n);
-  if(pg){
-    pg.classList.add('active');
-    window.scrollTo(0,0);
-    const name = localStorage.getItem('is_name');
-    if(name) updateNavForUser(name);
-    if(n==='applications') loadApplicationsPage();
-    if(n==='saved') loadSavedPage();
-  } else {
-    _orig(n);
-  }
-};
 
-// ── PROFILE: save about + skills to DB ────────────
-const _origSaveAbout = window.saveAbout;
-window.saveAbout = async function(){
-  const text = document.getElementById('aboutText').value;
-  document.getElementById('aboutView').innerHTML=`<p style="font-size:14px;color:var(--gray);line-height:1.75">${text}</p>`;
-  toggleEditMode();
-  try{ await apiCall('/api/user/profile','PUT',{about:text}); showToast('Profile saved!'); }catch(e){ showToast('Saved!'); }
-};
-
-const _origAddSkill = window.addSkill;
-window.addSkill = async function(){
-  const inp = document.getElementById('newSkill');
-  const val = inp.value.trim();
-  if(!val) return;
-  const wrap = inp.parentElement.previousElementSibling;
-  const tag = document.createElement('span');
-  tag.style.cssText='background:var(--blue-light);color:var(--blue);padding:5px 13px;border-radius:7px;font-size:13px;font-weight:600;border:1px solid var(--blue-mid)';
-  tag.textContent = val;
-  wrap.appendChild(tag);
-  inp.value = '';
-  const allSkills = [...wrap.querySelectorAll('span')].map(s=>s.textContent.trim()).filter(Boolean);
-  try{ await apiCall('/api/user/profile','PUT',{skills:allSkills}); }catch(e){}
-  showToast('Skill added & saved!');
-};
 
 // [script continues below]
 // [script block continues below]
@@ -2239,34 +2274,146 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 // ── PATCH showPage for new pages ─────────────────────
-const _prevShowPage = window.showPage;
-window.showPage = function(n){
-  const extraPages = ['admin','resume'];
-  if(extraPages.includes(n) && !getToken() && !currentUser && n!=='admin'){
-    _prevShowPage('login'); return;
-  }
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  const pg = document.getElementById('page-'+n);
-  if(pg){
-    pg.classList.add('active');
-    window.scrollTo(0,0);
-    const name = localStorage.getItem('is_name');
-    if(name) updateNavForUser(name);
-    if(n==='admin') loadAdminPage();
-    if(n==='resume'){
-      // reset
-      document.getElementById('resumeDrop').innerHTML = '<div style="font-size:40px;margin-bottom:12px">📄</div><div style="font-size:15px;font-weight:600;margin-bottom:6px">Drop your resume here or click to browse</div><div style="font-size:13px;color:var(--gray)">PDF, DOCX supported · Max 5MB</div><input type="file" id="resumeFile" accept=".pdf,.docx" style="display:none" onchange="handleResumeUpload(this)"/>';
-      document.getElementById('resume-result').style.display = 'none';
-    }
-  } else {
-    _prevShowPage(n);
-  }
-};
-
 // ── Wire profile sidebar "Upload Resume" button ───────
 document.querySelectorAll('.btn').forEach(btn=>{
   if(btn.textContent.includes('Upload Resume')) btn.onclick = ()=>showPage('resume');
 });
+</script>
+
+<script>
+// ── UNIFIED showPage (handles all pages cleanly) ──────────────────
+const _baseShowPage = window.showPage;
+window.showPage = function(n){
+  const protectedPages = ['dashboard','browse','profile','applications','saved','skillgap','notifications','admin','resume','interviews'];
+  const publicPages = ['company'];
+  if(protectedPages.includes(n) && !getToken() && !currentUser){
+    _baseShowPage('login'); return;
+  }
+  // Try to find page div directly
+  const pg = document.getElementById('page-'+n);
+  if(pg){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    pg.classList.add('active');
+    window.scrollTo(0,0);
+    // Update nav user name
+    const name = localStorage.getItem('is_name');
+    if(name) updateNavForUser(name);
+    // Page-specific logic
+    if(n==='browse') loadInternships();
+    if(n==='dashboard'){ setTimeout(animateSkillBars,400); loadDashboard(); }
+    if(n==='landing') setTimeout(animateCounters,500);
+    if(n==='login') resetAuthForms();
+    if(n==='applications') loadApplicationsPage();
+    if(n==='saved') loadSavedPage();
+    if(n==='admin') { if(typeof loadAdminPage==='function') loadAdminPage(); }
+    if(n==='resume'){
+      const drop = document.getElementById('resumeDrop');
+      const result = document.getElementById('resume-result');
+      if(drop) drop.innerHTML = '<div style="font-size:40px;margin-bottom:12px">📄</div><div style="font-size:15px;font-weight:600;margin-bottom:6px">Drop your resume here or click to browse</div><div style="font-size:13px;color:var(--gray)">PDF, DOCX supported</div><input type="file" id="resumeFile" accept=".pdf,.docx" style="display:none" onchange="handleResumeUpload(this)"/>';
+      if(result) result.style.display='none';
+    }
+  } else {
+    _baseShowPage(n);
+  }
+};
+
+// ── SAVE ABOUT (with DB sync) ─────────────────────────────────────
+window.saveAbout = async function(){
+  const text = document.getElementById('aboutText')?.value || '';
+  const view = document.getElementById('aboutView');
+  if(view) view.innerHTML = `<p style="font-size:14px;color:var(--gray);line-height:1.75">${text}</p>`;
+  if(typeof toggleEditMode === 'function') toggleEditMode();
+  try{ await apiCall('/api/user/profile','PUT',{about:text}); showToast('Profile saved!'); }
+  catch(e){ showToast('Saved!'); }
+};
+
+// ── ADD SKILL (with DB sync) ──────────────────────────────────────
+window.addSkill = async function(){
+  const inp = document.getElementById('newSkill');
+  if(!inp) return;
+  const val = inp.value.trim();
+  if(!val) return;
+  const wrap = inp.parentElement?.previousElementSibling;
+  if(wrap){
+    const tag = document.createElement('span');
+    tag.style.cssText='background:var(--blue-light);color:var(--blue);padding:5px 13px;border-radius:7px;font-size:13px;font-weight:600;border:1px solid var(--blue-mid)';
+    tag.textContent = val;
+    wrap.appendChild(tag);
+  }
+  inp.value = '';
+  const allSkills = [...(wrap?.querySelectorAll('span')||[])].map(s=>s.textContent.trim()).filter(Boolean);
+  try{ await apiCall('/api/user/profile','PUT',{skills:allSkills}); }catch(e){}
+  showToast('Skill added!');
+};
+
+// ── Wire "Upload Resume" button ───────────────────────────────────
+document.querySelectorAll('.btn').forEach(btn=>{
+  if(btn.textContent.trim().includes('Upload Resume'))
+    btn.onclick = ()=>showPage('resume');
+});
+
+// ── Wire profile sidebar My Profile link ──────────────────────────
+document.querySelectorAll('.sidebar-item').forEach(item=>{
+  if(item.textContent.trim()==='My Profile') item.onclick=()=>showPage('profile');
+});
+</script>
+
+<script>
+// ── Real live count from DB ──────────────────────────────────────
+(async function fetchLiveCount(){
+  try{
+    const res = await fetch('/api/internships');
+    if(res.ok){
+      const data = await res.json();
+      const el = document.getElementById('live-count');
+      if(el && data.length) el.innerHTML = '<em>'+data.length+'</em>';
+    }
+  }catch(e){}
+})();
+
+// ── Inject AI explanation section after features ──────────────────
+(function(){
+  const tintedSections = document.querySelectorAll('#page-landing .section-tinted');
+  const target = tintedSections[0];
+  if(!target) return;
+  const sec = document.createElement('section');
+  sec.className = 'section section-white';
+  sec.innerHTML = `
+    <div class="section-tag">Transparency</div>
+    <h2>How our matching<br><em>actually works</em></h2>
+    <p class="sub">No black box. Here's exactly what scores your matches.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px">
+      <div style="background:var(--bg);border-radius:14px;padding:22px;border:1px solid var(--gray-light);text-align:center">
+        <div style="font-size:26px;font-weight:700;color:var(--blue);margin-bottom:6px">40%</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px">Skill Match</div>
+        <div style="font-size:13px;color:var(--gray)">How many required skills you have vs what the role needs</div>
+      </div>
+      <div style="background:var(--bg);border-radius:14px;padding:22px;border:1px solid var(--gray-light);text-align:center">
+        <div style="font-size:26px;font-weight:700;color:var(--blue);margin-bottom:6px">25%</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px">Domain Fit</div>
+        <div style="font-size:13px;color:var(--gray)">Your branch and preferred domain vs internship domain</div>
+      </div>
+      <div style="background:var(--bg);border-radius:14px;padding:22px;border:1px solid var(--gray-light);text-align:center">
+        <div style="font-size:26px;font-weight:700;color:var(--blue);margin-bottom:6px">20%</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px">Preferences</div>
+        <div style="font-size:13px;color:var(--gray)">Location, work mode, stipend match with your settings</div>
+      </div>
+      <div style="background:var(--bg);border-radius:14px;padding:22px;border:1px solid var(--gray-light);text-align:center">
+        <div style="font-size:26px;font-weight:700;color:var(--blue);margin-bottom:6px">15%</div>
+        <div style="font-size:14px;font-weight:600;margin-bottom:6px">Profile</div>
+        <div style="font-size:13px;color:var(--gray)">Year of study, CGPA, profile completeness</div>
+      </div>
+    </div>
+    <div style="background:var(--navy);border-radius:14px;padding:22px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px">
+        <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:4px">Why no "95% accuracy" claim?</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.6);line-height:1.65">InternSetu is in beta — we don't have enough data to prove that number yet. What we can promise: matching is transparent, explainable, and improves as your profile grows.</div>
+      </div>
+      <button class="btn" onclick="showPage('register')" style="background:rgba(36,97,232,.3);color:#93c5fd;border:1px solid rgba(36,97,232,.4);font-size:13px;padding:10px 20px;flex-shrink:0">Try it →</button>
+    </div>
+  `;
+  target.parentNode.insertBefore(sec, target);
+})();
 </script>
 </body>
 </html>
