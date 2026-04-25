@@ -314,11 +314,11 @@ def send_deadline_notification():
             "personalizations": [{"to": [{"email": user['email']}]}],
             "from": {"email": "noreply@internsetu.app", "name": "InternSetu"},
             "subject": f"⏰ {len(closing_soon)} internship(s) closing soon!",
-            "content": [{"type": "text/plain", "value": f"Hi {user['name']},\n\nThese internships are closing soon:\n" + "\n".join([f"• {i['company']} - {i['role']} ({i['deadline']} left)" for i in closing_soon]) + "\n\nApply now: https://internsetu-production.up.railway.app\n\nTeam InternSetu"}]
+            "content": [{"type": "text/plain", "value": f"Hi {user['name']},\n\nThese internships are closing soon:\n" + "\n"\n".join([f"- {i['company']} - {i['role']} ({i['deadline']} left)" for i in closing_soon]) + "\n\nApply now: https://internsetu-production.up.railway.app\n\nTeam InternSetu"}]
 
 These internships are closing soon:
 " + "
-".join([f"• {i['company']} - {i['role']} ({i['deadline']} left)" for i in closing_soon]) + "
+"\n".join([f"- {i['company']} - {i['role']} ({i['deadline']} left)" for i in closing_soon]) + "
 
 Apply now: https://internsetu-production.up.railway.app
 
