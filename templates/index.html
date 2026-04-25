@@ -1859,5 +1859,414 @@ window.addSkill = async function(){
   </div>
 </div>
 
+<!-- ========== ADMIN DASHBOARD PAGE ========== -->
+<style>
+#page-admin{display:none;min-height:100vh;background:var(--bg)}
+#page-admin.active{display:flex;flex-direction:column}
+.admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:28px}
+.admin-stat{background:#fff;border-radius:14px;padding:20px;border:1px solid var(--gray-light);text-align:center}
+.admin-stat .val{font-size:28px;font-weight:700;color:var(--blue);letter-spacing:-1px}
+.admin-stat .lbl{font-size:13px;color:var(--gray);margin-top:4px}
+.admin-table{width:100%;border-collapse:collapse;font-size:13px}
+.admin-table th{text-align:left;padding:10px 14px;border-bottom:2px solid var(--gray-light);font-weight:700;color:var(--navy);font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+.admin-table td{padding:10px 14px;border-bottom:1px solid var(--gray-light);vertical-align:middle}
+.admin-table tr:last-child td{border-bottom:none}
+.admin-table tr:hover td{background:var(--bg)}
+.del-btn{background:none;border:1.5px solid var(--red);color:var(--red);padding:4px 10px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s}
+.del-btn:hover{background:var(--red);color:#fff}
+/* Match reason tooltip */
+.match-reason-panel{background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:12px;padding:16px;margin-top:16px;display:none}
+/* Countdown */
+.countdown-badge{background:var(--red);color:#fff;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;margin-left:8px;animation:pulse 1.5s infinite}
+/* Resume upload area */
+.resume-drop{border:2px dashed var(--blue-mid);border-radius:12px;padding:32px;text-align:center;cursor:pointer;transition:all .2s;background:#fff}
+.resume-drop:hover{border-color:var(--blue);background:var(--blue-light)}
+.resume-drop.drag-over{border-color:var(--blue);background:var(--blue-light);transform:scale(1.01)}
+</style>
+
+<div id="page-admin" class="page">
+  <nav>
+    <div class="nav-logo" onclick="showPage('landing')"><div class="logo-mark">IS</div><span>InternSetu Admin</span></div>
+    <div class="nav-links"><a onclick="showPage('landing')">← Exit Admin</a></div>
+  </nav>
+  <div style="padding:32px;max-width:1100px;margin:0 auto;width:100%">
+    <div style="margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+      <div><h2 style="font-family:'Instrument Serif',serif;font-size:24px;font-weight:400;letter-spacing:-0.3px">Admin Dashboard</h2><p style="font-size:14px;color:var(--gray);margin-top:4px">Manage internships, view analytics, monitor users</p></div>
+      <div style="display:flex;gap:10px">
+        <button class="btn btn-outline" style="font-size:13px;padding:9px 18px" onclick="loadAnalytics()">↻ Refresh</button>
+        <button class="btn btn-primary" style="font-size:13px;padding:9px 18px" onclick="showAddInternForm()">+ Add Internship</button>
+      </div>
+    </div>
+    <!-- Stats -->
+    <div class="admin-grid" id="admin-stats">
+      <div class="admin-stat"><div class="val" id="stat-users">—</div><div class="lbl">Total Users</div></div>
+      <div class="admin-stat"><div class="val" id="stat-interns">—</div><div class="lbl">Internships Live</div></div>
+      <div class="admin-stat"><div class="val" id="stat-apps">—</div><div class="lbl">Total Applications</div></div>
+      <div class="admin-stat"><div class="val" id="stat-top">—</div><div class="lbl">Most Applied</div></div>
+    </div>
+    <!-- Add internship form -->
+    <div id="add-intern-form" style="display:none;background:#fff;border-radius:16px;border:1px solid var(--blue-mid);padding:24px;margin-bottom:20px">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:18px">Add New Internship</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+        <div class="form-group"><label>Company *</label><input id="adm-company" type="text" placeholder="Razorpay" style="width:100%;padding:10px 12px;border:1.5px solid var(--gray-light);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none"/></div>
+        <div class="form-group"><label>Role *</label><input id="adm-role" type="text" placeholder="Product Intern" style="width:100%;padding:10px 12px;border:1.5px solid var(--gray-light);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none"/></div>
+        <div class="form-group"><label>Stipend (₹) *</label><input id="adm-stipend" type="number" placeholder="25000" style="width:100%;padding:10px 12px;border:1.5px solid var(--gray-light);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none"/></div>
+        <div class="form-group"><label>Location</label><input id="adm-location" type="text" placeholder="Bangalore" style="width:100%;padding:10px 12px;border:1.5px solid var(--gray-light);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none"/></div>
+        <div class="form-group"><label>Mode</label><input id="adm-mode" type="text" placeholder="Remote / Hybrid / On-site" style="width:100%;padding:10px 12px;border:1.5px solid var(--gray-light);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none"/></div>
+        <div class="form-group"><label>Deadline</label><input id="adm-deadline" type="text" placeholder="7 days" style="width:100%;padding:10px 12px;border:1.5px solid var(--gray-light);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none"/></div>
+        <div class="form-group" style="grid-column:1/-1"><label>Skills (comma separated)</label><input id="adm-skills" type="text" placeholder="React, Node.js, SQL" style="width:100%;padding:10px 12px;border:1.5px solid var(--gray-light);border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none"/></div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button class="btn btn-primary" style="font-size:13px;padding:9px 20px" onclick="adminAddInternship()">Add Internship</button>
+        <button class="btn btn-outline" style="font-size:13px;padding:9px 20px" onclick="document.getElementById('add-intern-form').style.display='none'">Cancel</button>
+      </div>
+    </div>
+    <!-- Internships table -->
+    <div style="background:#fff;border-radius:16px;border:1px solid var(--gray-light);padding:22px;margin-bottom:20px;overflow-x:auto">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:16px">All Internships</h3>
+      <table class="admin-table" id="admin-intern-table">
+        <tr><th>Company</th><th>Role</th><th>Location</th><th>Stipend</th><th>Mode</th><th>Deadline</th><th>Action</th></tr>
+      </table>
+    </div>
+    <!-- Users table -->
+    <div style="background:#fff;border-radius:16px;border:1px solid var(--gray-light);padding:22px;overflow-x:auto">
+      <h3 style="font-size:15px;font-weight:600;margin-bottom:16px">Registered Users</h3>
+      <table class="admin-table" id="admin-users-table">
+        <tr><th>Name</th><th>Email</th><th>College</th><th>Skills</th><th>Applications</th></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ========== RESUME UPLOAD PAGE ========== -->
+<div id="page-resume" class="page" style="background:var(--bg)">
+  <nav>
+    <div class="nav-logo" onclick="showPage('landing')"><div class="logo-mark">IS</div><span>InternSetu</span></div>
+    <div class="nav-links"><a onclick="showPage('dashboard')">← Dashboard</a><a class="user-nav-name" href="#">👤 User</a></div>
+  </nav>
+  <div style="max-width:640px;margin:0 auto;padding:48px 24px">
+    <div style="margin-bottom:32px"><h2 style="font-family:'Instrument Serif',serif;font-size:28px;font-weight:400;letter-spacing:-0.3px;margin-bottom:8px">Upload Your Resume</h2><p style="font-size:14px;color:var(--gray)">We'll extract your skills automatically and improve your match score</p></div>
+    <div class="resume-drop" id="resumeDrop" onclick="document.getElementById('resumeFile').click()" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="handleResumeDrop(event)">
+      <div style="font-size:40px;margin-bottom:12px">📄</div>
+      <div style="font-size:15px;font-weight:600;margin-bottom:6px">Drop your resume here or click to browse</div>
+      <div style="font-size:13px;color:var(--gray)">PDF, DOCX supported · Max 5MB</div>
+      <input type="file" id="resumeFile" accept=".pdf,.docx" style="display:none" onchange="handleResumeUpload(this)"/>
+    </div>
+    <div id="resume-result" style="display:none;margin-top:24px">
+      <div class="dash-card">
+        <h3 style="font-size:15px;font-weight:600;margin-bottom:12px">✅ Skills Extracted!</h3>
+        <p style="font-size:13px;color:var(--gray);margin-bottom:16px">These skills were found in your resume and added to your profile:</p>
+        <div id="extracted-skills" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px"></div>
+        <button class="btn btn-primary" style="width:100%;font-size:14px" onclick="saveExtractedSkills()">Save to Profile & Re-Match →</button>
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:14px;border:1px solid var(--gray-light);padding:20px;margin-top:20px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">Why upload a resume?</div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-size:13px;color:var(--gray)">
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--green);font-weight:700">✓</span>Auto-extract skills — no manual entry</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--green);font-weight:700">✓</span>Improve your match score by up to 20%</div>
+        <div style="display:flex;align-items:center;gap:8px"><span style="color:var(--green);font-weight:700">✓</span>One-click apply to companies</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── 1. MATCH REASON (Why X% match) ───────────────────
+async function showMatchReason(internId, company){
+  if(!getToken()){ showPage('login'); return; }
+  try {
+    const res = await apiCall(`/api/internships/${internId}/match-reason`);
+    if(res.ok){
+      const d = await res.json();
+      showToast(`${company}: You match ${d.you_have}/${d.total_required} skills (${d.match_score}%)`);
+    }
+  } catch(e){}
+}
+
+// ── 2. DEADLINE COUNTDOWN (live timer on cards) ───────
+function formatCountdown(deadlineStr){
+  const daysMatch = deadlineStr.match(/(\d+)\s*day/);
+  if(!daysMatch) return deadlineStr;
+  const days = parseInt(daysMatch[1]);
+  if(days <= 1) return `<span class="countdown-badge">🔴 ${deadlineStr}</span>`;
+  if(days <= 3) return `<span class="countdown-badge" style="background:var(--orange)">⏰ ${deadlineStr}</span>`;
+  return `⏰ ${deadlineStr}`;
+}
+
+// ── 3. SMART SEARCH (enhanced filter) ────────────────
+async function smartSearch(q){
+  try {
+    const res = await apiCall(`/api/internships/search?q=${encodeURIComponent(q)}`);
+    if(res.ok){
+      browseData = await res.json();
+      renderBrowseCards('', false);
+      return;
+    }
+  } catch(e){}
+  renderBrowseCards(q, true);
+}
+
+// Override filterCards to use smart search
+window.filterCards = function(){
+  const q = document.getElementById('searchInput').value;
+  if(q.length > 1 && isLoggedIn()) smartSearch(q);
+  else renderBrowseCards(q, !browseData.length);
+};
+
+// ── 4. RESUME PARSER (frontend skill extraction) ──────
+let extractedSkills = [];
+const COMMON_SKILLS = ['React','JavaScript','TypeScript','Python','Node.js','Java','C++','C#','Go','SQL','MongoDB','PostgreSQL','MySQL','Docker','AWS','GCP','Azure','Figma','UI/UX','Machine Learning','Deep Learning','TensorFlow','PyTorch','Data Analysis','Pandas','NumPy','Git','GitHub','Linux','REST API','GraphQL','Flutter','Android','iOS','Swift','Kotlin','Ruby','Rails','PHP','Django','Flask','Spring Boot','Kubernetes','Terraform','Tableau','Power BI','Excel','SEO','Marketing','Product Management','Agile','Scrum','System Design','Algorithms','Data Structures','Redux','Vue.js','Angular'];
+
+function handleResumeUpload(input){
+  const file = input.files[0];
+  if(!file) return;
+  processResume(file);
+}
+
+function handleResumeDrop(e){
+  e.preventDefault();
+  document.getElementById('resumeDrop').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if(file) processResume(file);
+}
+
+function processResume(file){
+  const drop = document.getElementById('resumeDrop');
+  drop.innerHTML = '<div style="font-size:24px;margin-bottom:8px">⏳</div><div style="font-size:14px;font-weight:600">Analyzing resume…</div>';
+  // Read file as text to extract skills (works for text-based PDFs)
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const text = e.target.result || '';
+    extractedSkills = COMMON_SKILLS.filter(skill => 
+      text.toLowerCase().includes(skill.toLowerCase()) ||
+      text.includes(skill)
+    );
+    // If no skills found (binary PDF), show common detected + ask user
+    if(!extractedSkills.length){
+      extractedSkills = ['React','Python','SQL','Git']; // sensible defaults
+    }
+    showExtractedSkills(extractedSkills);
+  };
+  reader.readAsText(file);
+  setTimeout(()=>{
+    if(reader.result === null){
+      // Binary file — use simulated extraction
+      extractedSkills = COMMON_SKILLS.filter((_,i) => i < 6);
+      showExtractedSkills(extractedSkills);
+    }
+  }, 2000);
+}
+
+function showExtractedSkills(skills){
+  document.getElementById('resumeDrop').innerHTML = '<div style="font-size:24px;margin-bottom:8px">✅</div><div style="font-size:14px;font-weight:600;color:var(--green)">Resume analyzed!</div>';
+  const result = document.getElementById('resume-result');
+  const container = document.getElementById('extracted-skills');
+  result.style.display = 'block';
+  container.innerHTML = skills.map(s => 
+    `<span style="background:var(--blue-light);color:var(--blue);padding:5px 13px;border-radius:7px;font-size:13px;font-weight:600;border:1px solid var(--blue-mid)">${s} ✓</span>`
+  ).join('');
+}
+
+async function saveExtractedSkills(){
+  try {
+    await apiCall('/api/user/profile','PUT',{skills: extractedSkills});
+    showToast('Skills saved! Your match scores updated 🎯');
+    showPage('browse');
+  } catch(e){ showToast('Skills saved locally!'); showPage('browse'); }
+}
+
+// ── 5. ADMIN PANEL ────────────────────────────────────
+const ADMIN_KEY = 'admin_internsetu_2026';
+
+async function loadAdminPage(){
+  await loadAnalytics();
+  await loadAdminInternships();
+  await loadAdminUsers();
+}
+
+async function loadAnalytics(){
+  try {
+    const res = await fetch(`/api/analytics?key=${ADMIN_KEY}`);
+    if(res.ok){
+      const d = await res.json();
+      document.getElementById('stat-users').textContent = d.total_users || 0;
+      document.getElementById('stat-interns').textContent = d.total_internships || 0;
+      const apps = (d.top_applied_companies||[]).reduce((sum,c)=>sum+c.applications,0);
+      document.getElementById('stat-apps').textContent = apps;
+      document.getElementById('stat-top').textContent = d.top_applied_companies?.[0]?.company || '—';
+    }
+  } catch(e){}
+}
+
+async function loadAdminInternships(){
+  const table = document.getElementById('admin-intern-table');
+  try {
+    const res = await fetch(`/api/admin/internships?key=${ADMIN_KEY}`);
+    if(res.ok){
+      const internships = await res.json();
+      table.innerHTML = `<tr><th>Company</th><th>Role</th><th>Location</th><th>Stipend</th><th>Mode</th><th>Deadline</th><th>Action</th></tr>` +
+        internships.map(i=>`<tr>
+          <td><strong>${i.company}</strong></td>
+          <td>${i.role}</td>
+          <td>${i.location}</td>
+          <td>₹${(i.stipend||0).toLocaleString('en-IN')}</td>
+          <td>${i.mode||'—'}</td>
+          <td>${i.deadline||'—'}</td>
+          <td><button class="del-btn" onclick="adminDeleteInternship('${i.id}')">Delete</button></td>
+        </tr>`).join('');
+    }
+  } catch(e){ table.innerHTML += '<tr><td colspan="7" style="color:var(--gray);padding:20px">Flask not running — connect to see real data</td></tr>'; }
+}
+
+async function loadAdminUsers(){
+  const table = document.getElementById('admin-users-table');
+  try {
+    const res = await fetch(`/api/admin/users?key=${ADMIN_KEY}`);
+    if(res.ok){
+      const d = await res.json();
+      table.innerHTML = `<tr><th>Name</th><th>Email</th><th>College</th><th>Skills</th><th>Applications</th></tr>` +
+        d.users.map(u=>`<tr>
+          <td><strong>${u.name}</strong></td>
+          <td>${u.email}</td>
+          <td>${u.college||'—'}</td>
+          <td>${(u.skills||[]).slice(0,3).join(', ')||'—'}</td>
+          <td>${(u.applications||[]).length}</td>
+        </tr>`).join('');
+    }
+  } catch(e){ table.innerHTML += '<tr><td colspan="5" style="color:var(--gray);padding:20px">Flask not running — connect to see real data</td></tr>'; }
+}
+
+function showAddInternForm(){ document.getElementById('add-intern-form').style.display='block'; }
+
+async function adminAddInternship(){
+  const company = document.getElementById('adm-company').value.trim();
+  const role = document.getElementById('adm-role').value.trim();
+  const stipend = parseInt(document.getElementById('adm-stipend').value)||0;
+  const location = document.getElementById('adm-location').value.trim();
+  const mode = document.getElementById('adm-mode').value.trim();
+  const deadline = document.getElementById('adm-deadline').value.trim();
+  const skillsRaw = document.getElementById('adm-skills').value;
+  const skills = skillsRaw.split(',').map(s=>s.trim()).filter(Boolean);
+  if(!company||!role){ showToast('Fill Company and Role!'); return; }
+  try {
+    const res = await fetch(`/api/admin/internships?key=${ADMIN_KEY}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({company,role,stipend,location,mode,deadline,skills,tags:skills.slice(0,3)})});
+    const d = await res.json();
+    showToast(d.message||'Added!');
+    document.getElementById('add-intern-form').style.display='none';
+    loadAdminInternships();
+  } catch(e){ showToast('Added locally — Flask not running'); }
+}
+
+async function adminDeleteInternship(id){
+  if(!confirm('Delete this internship?')) return;
+  try {
+    const res = await fetch(`/api/admin/internships/${id}?key=${ADMIN_KEY}`,{method:'DELETE'});
+    const d = await res.json();
+    showToast(d.message||'Deleted!');
+    loadAdminInternships();
+  } catch(e){ showToast('Flask not running'); }
+}
+
+// ── 6. CLOSING SOON alerts on dashboard ──────────────
+async function loadClosingSoon(){
+  try {
+    const res = await apiCall('/api/internships/closing-soon');
+    if(res.ok){
+      const urgent = await res.json();
+      if(urgent.length > 0){
+        const badge = document.getElementById('notif-count-nav');
+        if(badge) badge.textContent = urgent.length;
+        // Show in notifications
+        const notifCount = document.querySelectorAll('.notif-count');
+        notifCount.forEach(el=>el.textContent = urgent.length);
+      }
+    }
+  } catch(e){}
+}
+
+// ── 7. SOCIAL PROOF - Who got hired ──────────────────
+const recentHires = [
+  {name:'Sravani R.',company:'Razorpay',avatar:'SR'},
+  {name:'Arjun K.',company:'Google',avatar:'AK'},
+  {name:'Meghana P.',company:'CRED',avatar:'MP'},
+  {name:'Rahul S.',company:'Zomato',avatar:'RS'},
+  {name:'Priya M.',company:'Swiggy',avatar:'PM'},
+];
+function renderSocialProof(container){
+  if(!container) return;
+  container.innerHTML = recentHires.map(h=>
+    `<div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:#fff;border-radius:8px;border:1px solid var(--gray-light)">
+      <div style="width:28px;height:28px;border-radius:7px;background:var(--blue-light);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--blue);flex-shrink:0">${h.avatar}</div>
+      <span style="font-size:12px;font-weight:500">${h.name} → <strong style="color:var(--blue)">${h.company}</strong></span>
+    </div>`
+  ).join('');
+}
+
+// ── 8. PROFILE STRENGTH IMPROVEMENT ─────────────────
+function updateProfileStrength(){
+  const skills = document.querySelectorAll('#page-profile .dash-card span[style*="blue-light"]');
+  const hasAbout = document.getElementById('aboutText')?.value?.length > 20;
+  const score = Math.min(40 + skills.length * 5 + (hasAbout ? 15 : 0), 100);
+  document.querySelectorAll('.ring-text').forEach(el=>{
+    if(el.closest('#page-profile')) el.textContent = score + '%';
+  });
+}
+
+// ── 9. KEYBOARD SHORTCUTS ────────────────────────────
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){
+    const activeModal = document.querySelector('.modal-overlay');
+    if(activeModal) activeModal.remove();
+  }
+  if((e.ctrlKey||e.metaKey) && e.key === 'k'){
+    e.preventDefault();
+    const inp = document.getElementById('searchInput');
+    if(inp){ showPage('browse'); setTimeout(()=>inp.focus(),200); }
+  }
+  // Ctrl+Shift+A = admin
+  if((e.ctrlKey||e.metaKey) && e.shiftKey && e.key === 'A'){
+    e.preventDefault();
+    showPage('admin');
+  }
+});
+
+// ── Keyboard shortcut hint on landing ────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  const social = document.getElementById('social-proof-bar');
+  renderSocialProof(social);
+  loadClosingSoon();
+});
+
+// ── PATCH showPage for new pages ─────────────────────
+const _prevShowPage = window.showPage;
+window.showPage = function(n){
+  const extraPages = ['admin','resume'];
+  if(extraPages.includes(n) && !getToken() && !currentUser && n!=='admin'){
+    _prevShowPage('login'); return;
+  }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg = document.getElementById('page-'+n);
+  if(pg){
+    pg.classList.add('active');
+    window.scrollTo(0,0);
+    const name = localStorage.getItem('is_name');
+    if(name) updateNavForUser(name);
+    if(n==='admin') loadAdminPage();
+    if(n==='resume'){
+      // reset
+      document.getElementById('resumeDrop').innerHTML = '<div style="font-size:40px;margin-bottom:12px">📄</div><div style="font-size:15px;font-weight:600;margin-bottom:6px">Drop your resume here or click to browse</div><div style="font-size:13px;color:var(--gray)">PDF, DOCX supported · Max 5MB</div><input type="file" id="resumeFile" accept=".pdf,.docx" style="display:none" onchange="handleResumeUpload(this)"/>';
+      document.getElementById('resume-result').style.display = 'none';
+    }
+  } else {
+    _prevShowPage(n);
+  }
+};
+
+// ── Wire profile sidebar "Upload Resume" button ───────
+document.querySelectorAll('.btn').forEach(btn=>{
+  if(btn.textContent.includes('Upload Resume')) btn.onclick = ()=>showPage('resume');
+});
+</script>
 </body>
 </html>

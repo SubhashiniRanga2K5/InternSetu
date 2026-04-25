@@ -332,5 +332,132 @@ def seed():
     mongo.db.internships.insert_many(internships)
     return jsonify({'message': f'Seeded {len(internships)} internships!'}), 201
 
+# ── ADMIN ROUTES ────────────────────────────────────────────
+ADMIN_KEY = os.environ.get('ADMIN_KEY', 'admin_internsetu_2026')
+
+def require_admin():
+    key = request.headers.get('X-Admin-Key') or request.args.get('key')
+    return key == ADMIN_KEY
+
+@app.route('/api/admin/internships', methods=['GET'])
+def admin_list_internships():
+    if not require_admin():
+        return jsonify({'message': 'Unauthorized'}), 401
+    internships = list(mongo.db.internships.find({}, {'_id': 0}))
+    return jsonify(internships), 200
+
+@app.route('/api/admin/internships', methods=['POST'])
+def admin_add_internship():
+    if not require_admin():
+        return jsonify({'message': 'Unauthorized'}), 401
+    data = request.get_json()
+    required = ['company', 'role', 'stipend', 'location']
+    if not all(k in data for k in required):
+        return jsonify({'message': 'Missing required fields'}), 400
+    # Generate id if not provided
+    if 'id' not in data:
+        data['id'] = data['company'].lower()[:3] + str(mongo.db.internships.count_documents({}))
+    mongo.db.internships.insert_one({k: v for k, v in data.items() if k != '_id'})
+    return jsonify({'message': f"Added {data['company']} internship!"}), 201
+
+@app.route('/api/admin/internships/<intern_id>', methods=['DELETE'])
+def admin_delete_internship(intern_id):
+    if not require_admin():
+        return jsonify({'message': 'Unauthorized'}), 401
+    result = mongo.db.internships.delete_one({'id': intern_id})
+    if result.deleted_count:
+        return jsonify({'message': 'Deleted!'}), 200
+    return jsonify({'message': 'Not found'}), 404
+
+@app.route('/api/admin/users', methods=['GET'])
+def admin_list_users():
+    if not require_admin():
+        return jsonify({'message': 'Unauthorized'}), 401
+    users = list(mongo.db.users.find({}, {'password': 0}))
+    for u in users:
+        u['_id'] = str(u['_id'])
+    return jsonify({'count': len(users), 'users': users}), 200
+
+# ── ANALYTICS ───────────────────────────────────────────────
+@app.route('/api/analytics', methods=['GET'])
+def analytics():
+    if not require_admin():
+        return jsonify({'message': 'Unauthorized'}), 401
+    total_users = mongo.db.users.count_documents({})
+    total_internships = mongo.db.internships.count_documents({})
+    # Most applied internships
+    pipeline = [
+        {'$unwind': '$applications'},
+        {'$group': {'_id': '$applications.company', 'count': {'$sum': 1}}},
+        {'$sort': {'count': -1}},
+        {'$limit': 5}
+    ]
+    top_companies = list(mongo.db.users.aggregate(pipeline))
+    # Skill distribution
+    skill_pipeline = [
+        {'$unwind': '$skills'},
+        {'$group': {'_id': '$skills', 'count': {'$sum': 1}}},
+        {'$sort': {'count': -1}},
+        {'$limit': 10}
+    ]
+    top_skills = list(mongo.db.users.aggregate(skill_pipeline))
+    return jsonify({
+        'total_users': total_users,
+        'total_internships': total_internships,
+        'top_applied_companies': [{'company': c['_id'], 'applications': c['count']} for c in top_companies],
+        'top_skills': [{'skill': s['_id'], 'count': s['count']} for s in top_skills]
+    }), 200
+
+# ── MATCH EXPLANATION ────────────────────────────────────────
+@app.route('/api/internships/<intern_id>/match-reason', methods=['GET'])
+@jwt_required()
+def match_reason(intern_id):
+    uid = get_jwt_identity()
+    user = mongo.db.users.find_one({'_id': ObjectId(uid)})
+    intern = mongo.db.internships.find_one({'id': intern_id}, {'_id': 0})
+    if not intern or not user:
+        return jsonify({'message': 'Not found'}), 404
+    user_skills = set(s.lower() for s in user.get('skills', []))
+    req_skills = intern.get('skills', [])
+    matched = [s for s in req_skills if s.lower() in user_skills]
+    missing = [s for s in req_skills if s.lower() not in user_skills]
+    score = int((len(matched) / len(req_skills)) * 100) if req_skills else 50
+    return jsonify({
+        'match_score': score,
+        'matched_skills': matched,
+        'missing_skills': missing,
+        'total_required': len(req_skills),
+        'you_have': len(matched)
+    }), 200
+
+# ── DEADLINE COUNTDOWN ───────────────────────────────────────
+@app.route('/api/internships/closing-soon', methods=['GET'])
+def closing_soon():
+    # Return internships with deadline <= 3 days
+    internships = list(mongo.db.internships.find({}, {'_id': 0}))
+    urgent = [i for i in internships if '1 day' in i.get('deadline', '') or '2 day' in i.get('deadline', '') or '3 day' in i.get('deadline', '')]
+    return jsonify(urgent), 200
+
+# ── SEARCH ───────────────────────────────────────────────────
+@app.route('/api/internships/search', methods=['GET'])
+def search_internships():
+    q = request.args.get('q', '').lower()
+    domain = request.args.get('domain', '')
+    min_stipend = int(request.args.get('min_stipend', 0))
+    mode = request.args.get('mode', '')
+    internships = list(mongo.db.internships.find({}, {'_id': 0}))
+    results = []
+    for i in internships:
+        if q and q not in i.get('company','').lower() and q not in i.get('role','').lower() and not any(q in s.lower() for s in i.get('skills',[])):
+            continue
+        if domain and domain.lower() not in i.get('domain','').lower():
+            continue
+        if min_stipend and i.get('stipend', 0) < min_stipend:
+            continue
+        if mode and mode.lower() not in i.get('mode','').lower():
+            continue
+        results.append(i)
+    return jsonify(results), 200
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)
