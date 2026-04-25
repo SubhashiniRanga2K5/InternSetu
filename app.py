@@ -14,9 +14,9 @@ app.config["MONGO_URI"] = os.environ.get("MONGO_URI", "mongodb+srv://subhashinir
 app.config["JWT_SECRET_KEY"] = os.environ.get("JWT_SECRET_KEY", "internsetu_secret_2026")
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = False
 
-mongo  = PyMongo(app)
+mongo = PyMongo(app)
 bcrypt = Bcrypt(app)
-jwt    = JWTManager(app)
+jwt = JWTManager(app)
 
 def fix_id(doc):
     if doc and '_id' in doc:
@@ -31,13 +31,13 @@ def home():
 # ── AUTH ────────────────────────────────────────────────────
 @app.route('/api/register', methods=['POST'])
 def register():
-    data     = request.get_json()
-    name     = data.get('name', '').strip()
-    email    = data.get('email', '').strip().lower()
+    data = request.get_json()
+    name = data.get('name', '').strip()
+    email = data.get('email', '').strip().lower()
     password = data.get('password', '')
-    college  = data.get('college', '')
-    domain   = data.get('domain', '')
-    skills   = data.get('skills', [])
+    college = data.get('college', '')
+    domain = data.get('domain', '')
+    skills = data.get('skills', [])
 
     if not all([name, email, password]):
         return jsonify({'message': 'All fields required'}), 400
@@ -56,10 +56,10 @@ def register():
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    data     = request.get_json()
-    email    = data.get('email', '').strip().lower()
+    data = request.get_json()
+    email = data.get('email', '').strip().lower()
     password = data.get('password', '')
-    user     = mongo.db.users.find_one({'email': email})
+    user = mongo.db.users.find_one({'email': email})
     if not user or not bcrypt.check_password_hash(user['password'], password):
         return jsonify({'message': 'Invalid email or password'}), 401
     token = create_access_token(identity=str(user['_id']))
@@ -73,7 +73,7 @@ def login():
 @app.route('/api/user/profile', methods=['GET'])
 @jwt_required()
 def get_profile():
-    uid  = get_jwt_identity()
+    uid = get_jwt_identity()
     user = mongo.db.users.find_one({'_id': ObjectId(uid)}, {'password': 0})
     if not user:
         return jsonify({'message': 'User not found'}), 404
@@ -82,9 +82,12 @@ def get_profile():
 @app.route('/api/user/profile', methods=['PUT'])
 @jwt_required()
 def update_profile():
-    uid  = get_jwt_identity()
+    uid = get_jwt_identity()
     data = request.get_json()
-    update = {k: data[k] for k in ['name','college','domain','skills','location','about'] if k in data}
+    update = {}
+    for field in ['name', 'college', 'domain', 'skills', 'location', 'about', 'resume_name']:
+        if field in data:
+            update[field] = data[field]
     mongo.db.users.update_one({'_id': ObjectId(uid)}, {'$set': update})
     return jsonify({'message': 'Profile updated!'}), 200
 
@@ -97,22 +100,22 @@ def get_internships():
 @app.route('/api/internships/matched', methods=['GET'])
 @jwt_required()
 def get_matched():
-    uid           = get_jwt_identity()
-    user          = mongo.db.users.find_one({'_id': ObjectId(uid)})
-    user_skills   = set(s.lower() for s in user.get('skills', []))
-    user_domain   = user.get('domain', '').lower()
+    uid = get_jwt_identity()
+    user = mongo.db.users.find_one({'_id': ObjectId(uid)})
+    user_skills = set(s.lower() for s in user.get('skills', []))
+    user_domain = user.get('domain', '').lower()
     user_location = user.get('location', '').lower()
-    internships   = list(mongo.db.internships.find({}, {'_id': 0}))
+    internships = list(mongo.db.internships.find({}, {'_id': 0}))
     for intern in internships:
-        req_skills    = set(s.lower() for s in intern.get('skills', []))
-        score         = 30
+        req_skills = set(s.lower() for s in intern.get('skills', []))
+        score = 30
         if req_skills:
             matched = len(user_skills & req_skills)
-            score  += int((matched / len(req_skills)) * 40)
+            score += int((matched / len(req_skills)) * 40)
         intern_domain = intern.get('domain', '').lower()
         if user_domain and (user_domain in intern_domain or intern_domain in user_domain):
             score += 20
-        if intern.get('mode') == 'Remote':
+        if intern.get('mode', '') == 'Remote':
             score += 10
         elif user_location and user_location in intern.get('location', '').lower():
             score += 10
@@ -120,35 +123,82 @@ def get_matched():
     internships.sort(key=lambda x: x['match_score'], reverse=True)
     return jsonify(internships), 200
 
+@app.route('/api/internships/search', methods=['GET'])
+def search_internships():
+    q = request.args.get('q', '').lower()
+    domain = request.args.get('domain', '')
+    stipend = request.args.get('stipend', 0, type=int)
+    mode = request.args.get('mode', '')
+    internships = list(mongo.db.internships.find({}, {'_id': 0}))
+    results = []
+    for i in internships:
+        if q and q not in i.get('company', '').lower() and q not in i.get('role', '').lower():
+            skills_text = ' '.join(i.get('skills', [])).lower()
+            if q not in skills_text:
+                continue
+        if domain and domain.lower() not in i.get('domain', '').lower():
+            continue
+        if stipend and i.get('stipend', 0) < stipend:
+            continue
+        if mode and mode.lower() not in i.get('mode', '').lower():
+            continue
+        results.append(i)
+    return jsonify(results), 200
+
+@app.route('/api/internships/closing-soon', methods=['GET'])
+def closing_soon():
+    internships = list(mongo.db.internships.find({}, {'_id': 0}))
+    closing = [i for i in internships if any(x in i.get('deadline', '') for x in ['1 day', '2 day', '3 day'])]
+    return jsonify(closing), 200
+
+@app.route('/api/internships/<intern_id>/match-reason', methods=['GET'])
+@jwt_required()
+def match_reason(intern_id):
+    uid = get_jwt_identity()
+    user = mongo.db.users.find_one({'_id': ObjectId(uid)})
+    intern = mongo.db.internships.find_one({'id': intern_id}, {'_id': 0})
+    if not intern:
+        return jsonify({'message': 'Not found'}), 404
+    user_skills = set(s.lower() for s in user.get('skills', []))
+    req_skills = set(s.lower() for s in intern.get('skills', []))
+    matched = user_skills & req_skills
+    missing = req_skills - user_skills
+    return jsonify({
+        'matched_skills': list(matched),
+        'missing_skills': list(missing),
+        'domain_match': user.get('domain', '').lower() in intern.get('domain', '').lower()
+    }), 200
+
 # ── BOOKMARKS ───────────────────────────────────────────────
 @app.route('/api/bookmark/<intern_id>', methods=['POST'])
 @jwt_required()
 def bookmark(intern_id):
-    uid       = get_jwt_identity()
-    user      = mongo.db.users.find_one({'_id': ObjectId(uid)})
+    uid = get_jwt_identity()
+    user = mongo.db.users.find_one({'_id': ObjectId(uid)})
     bookmarks = user.get('bookmarks', [])
     if intern_id in bookmarks:
-        mongo.db.users.update_one({'_id': ObjectId(uid)}, {'$pull':  {'bookmarks': intern_id}})
+        mongo.db.users.update_one({'_id': ObjectId(uid)}, {'$pull': {'bookmarks': intern_id}})
         return jsonify({'message': 'Removed', 'saved': False}), 200
-    mongo.db.users.update_one({'_id': ObjectId(uid)}, {'$push': {'bookmarks': intern_id}})
-    return jsonify({'message': 'Saved!', 'saved': True}), 200
+    else:
+        mongo.db.users.update_one({'_id': ObjectId(uid)}, {'$push': {'bookmarks': intern_id}})
+        return jsonify({'message': 'Saved!', 'saved': True}), 200
 
 @app.route('/api/bookmarks', methods=['GET'])
 @jwt_required()
 def get_bookmarks():
-    uid       = get_jwt_identity()
-    user      = mongo.db.users.find_one({'_id': ObjectId(uid)})
+    uid = get_jwt_identity()
+    user = mongo.db.users.find_one({'_id': ObjectId(uid)})
     bookmarks = user.get('bookmarks', [])
-    saved     = list(mongo.db.internships.find({'id': {'$in': bookmarks}}, {'_id': 0}))
+    saved = list(mongo.db.internships.find({'id': {'$in': bookmarks}}, {'_id': 0}))
     return jsonify(saved), 200
 
 # ── APPLICATIONS ─────────────────────────────────────────────
 @app.route('/api/apply/<intern_id>', methods=['POST'])
 @jwt_required()
 def apply(intern_id):
-    uid    = get_jwt_identity()
-    user   = mongo.db.users.find_one({'_id': ObjectId(uid)})
-    apps   = user.get('applications', [])
+    uid = get_jwt_identity()
+    user = mongo.db.users.find_one({'_id': ObjectId(uid)})
+    apps = user.get('applications', [])
     if any(a.get('intern_id') == intern_id for a in apps):
         return jsonify({'message': 'Already applied!'}), 409
     intern = mongo.db.internships.find_one({'id': intern_id}, {'_id': 0})
@@ -158,40 +208,27 @@ def apply(intern_id):
         {'_id': ObjectId(uid)},
         {'$push': {'applications': {
             'intern_id': intern_id,
-            'company':   intern.get('company'),
-            'role':      intern.get('role'),
-            'status':    'Applied'
+            'company': intern.get('company'),
+            'role': intern.get('role'),
+            'status': 'Applied'
         }}}
     )
-    return jsonify({'message': f"Applied to {intern.get('company')}!"}), 200
+    return jsonify({'message': 'Applied to ' + intern.get('company') + '!'}), 200
 
 @app.route('/api/applications', methods=['GET'])
 @jwt_required()
 def get_applications():
-    uid  = get_jwt_identity()
+    uid = get_jwt_identity()
     user = mongo.db.users.find_one({'_id': ObjectId(uid)})
     return jsonify(user.get('applications', [])), 200
 
-# ── RESUME ──────────────────────────────────────────────────
-@app.route('/api/resume/upload', methods=['POST'])
-@jwt_required()
-def upload_resume():
-    uid  = get_jwt_identity()
-    data = request.get_json()
-    resume_name = data.get('resume_name', '')
-    mongo.db.users.update_one(
-        {'_id': ObjectId(uid)},
-        {'$set': {'resume_name': resume_name, 'has_resume': True}}
-    )
-    return jsonify({'message': 'Resume saved!', 'name': resume_name}), 200
-
-# ── COMPANY AUTH ─────────────────────────────────────────────
+# ── COMPANY AUTH ──────────────────────────────────────────────
 @app.route('/api/company/register', methods=['POST'])
 def company_register():
-    data         = request.get_json()
-    name         = data.get('name', '').strip()
-    email        = data.get('email', '').strip().lower()
-    password     = data.get('password', '')
+    data = request.get_json()
+    name = data.get('name', '').strip()
+    email = data.get('email', '').strip().lower()
+    password = data.get('password', '')
     company_name = data.get('company_name', '').strip()
     if not all([name, email, password, company_name]):
         return jsonify({'message': 'All fields required'}), 400
@@ -203,13 +240,13 @@ def company_register():
 
 @app.route('/api/company/login', methods=['POST'])
 def company_login():
-    data     = request.get_json()
-    email    = data.get('email', '').strip().lower()
+    data = request.get_json()
+    email = data.get('email', '').strip().lower()
     password = data.get('password', '')
-    company  = mongo.db.companies.find_one({'email': email})
+    company = mongo.db.companies.find_one({'email': email})
     if not company or not bcrypt.check_password_hash(company['password'], password):
         return jsonify({'message': 'Invalid credentials'}), 401
-    token = create_access_token(identity='company_'+str(company['_id']))
+    token = create_access_token(identity='company_' + str(company['_id']))
     return jsonify({'token': token, 'company_name': company['company_name'], 'name': company['name']}), 200
 
 @app.route('/api/company/post', methods=['POST'])
@@ -218,72 +255,110 @@ def post_internship():
     uid = get_jwt_identity()
     if not uid.startswith('company_'):
         return jsonify({'message': 'Company login required'}), 403
-    data     = request.get_json()
-    required = ['role', 'location', 'stipend', 'domain', 'skills', 'deadline']
-    if not all(data.get(f) for f in required):
-        return jsonify({'message': 'Fill all required fields'}), 400
+    data = request.get_json()
+    new_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
     company_id = uid.replace('company_', '')
-    company    = mongo.db.companies.find_one({'_id': ObjectId(company_id)})
-    new_id     = ''.join(random.choices(string.ascii_lowercase + string.digits, k=6))
-    skills_list = data['skills'] if isinstance(data['skills'], list) else data['skills'].split(',')
+    company = mongo.db.companies.find_one({'_id': ObjectId(company_id)})
+    skills = data.get('skills', [])
+    if isinstance(skills, str):
+        skills = [s.strip() for s in skills.split(',')]
     internship = {
-        'id':       new_id,
-        'company':  company['company_name'] if company else 'Company',
-        'logo':     company['company_name'][0] if company else 'C',
-        'role':     data['role'],
-        'location': data['location'],
-        'mode':     data.get('mode', 'Hybrid'),
-        'stipend':  int(data['stipend']),
-        'domain':   data['domain'],
-        'skills':   skills_list,
+        'id': new_id,
+        'company': company['company_name'] if company else 'Company',
+        'logo': company['company_name'][0] if company else 'C',
+        'role': data.get('role', ''),
+        'location': data.get('location', ''),
+        'mode': data.get('mode', 'Hybrid'),
+        'stipend': int(data.get('stipend', 0)),
+        'domain': data.get('domain', ''),
+        'skills': skills,
         'deadline': data.get('deadline', '30 days'),
-        'tags':     skills_list[:3],
+        'tags': skills[:3],
         'posted_by': company_id
     }
     mongo.db.internships.insert_one(internship)
     return jsonify({'message': 'Internship posted!', 'id': new_id}), 201
 
-# ── EMAIL NOTIFICATIONS ──────────────────────────────────────
+# ── ADMIN ─────────────────────────────────────────────────────
+@app.route('/api/admin/internships', methods=['GET'])
+def admin_internships():
+    internships = list(mongo.db.internships.find({}, {'_id': 0}))
+    return jsonify(internships), 200
+
+@app.route('/api/admin/internships/<intern_id>', methods=['DELETE'])
+def admin_delete_internship(intern_id):
+    mongo.db.internships.delete_one({'id': intern_id})
+    return jsonify({'message': 'Deleted!'}), 200
+
+@app.route('/api/admin/users', methods=['GET'])
+def admin_users():
+    users = list(mongo.db.users.find({}, {'password': 0}))
+    for u in users:
+        u['_id'] = str(u['_id'])
+    return jsonify(users), 200
+
+@app.route('/api/analytics', methods=['GET'])
+def analytics():
+    return jsonify({
+        'total_users': mongo.db.users.count_documents({}),
+        'total_internships': mongo.db.internships.count_documents({}),
+        'total_applications': sum(len(u.get('applications', [])) for u in mongo.db.users.find({}, {'applications': 1})),
+        'total_companies': mongo.db.companies.count_documents({})
+    }), 200
+
+# ── EMAIL NOTIFICATIONS ───────────────────────────────────────
 @app.route('/api/notify/deadline', methods=['POST'])
 @jwt_required()
 def send_deadline_notification():
     sendgrid_key = os.environ.get('SENDGRID_API_KEY')
     if not sendgrid_key:
-        return jsonify({'message': 'Email notifications not configured — add SENDGRID_API_KEY to Railway env vars'}), 200
-    uid          = get_jwt_identity()
-    user         = mongo.db.users.find_one({'_id': ObjectId(uid)})
-    internships  = list(mongo.db.internships.find({}, {'_id': 0}))
-    closing_soon = [i for i in internships if any(x in i.get('deadline', '') for x in ['1 day', '2 day', '3 day'])]
-    if not closing_soon:
+        return jsonify({'message': 'Add SENDGRID_API_KEY in Railway variables to enable emails!'}), 200
+    uid = get_jwt_identity()
+    user = mongo.db.users.find_one({'_id': ObjectId(uid)})
+    internships = list(mongo.db.internships.find({}, {'_id': 0}))
+    closing = [i for i in internships if any(x in i.get('deadline', '') for x in ['1 day', '2 day', '3 day'])]
+    if not closing:
         return jsonify({'message': 'No deadlines closing soon!'}), 200
+    lines = [
+        'Hi ' + user['name'] + ',',
+        '',
+        'These internships are closing soon:',
+        ''
+    ]
+    for i in closing:
+        lines.append('- ' + i['company'] + ' - ' + i['role'] + ' (' + i['deadline'] + ' left)')
+    lines += ['', 'Apply now: https://internsetu-production.up.railway.app', '', 'Team InternSetu']
+    body = '\n'.join(lines)
     try:
-        import urllib.request, json as json_lib
-        items = "\n".join([f"- {i['company']} - {i['role']} ({i['deadline']} left)" for i in closing_soon])
-        body  = f"Hi {user['name']},\n\nThese internships are closing soon:\n{items}\n\nApply now: https://internsetu-production.up.railway.app\n\nTeam InternSetu"
+        import urllib.request
+        import json as json_lib
         email_data = {
             "personalizations": [{"to": [{"email": user['email']}]}],
-            "from":    {"email": "noreply@internsetu.app", "name": "InternSetu"},
-            "subject": f"⏰ {len(closing_soon)} internship(s) closing soon!",
+            "from": {"email": "noreply@internsetu.app", "name": "InternSetu"},
+            "subject": str(len(closing)) + " internship(s) closing soon!",
             "content": [{"type": "text/plain", "value": body}]
         }
         req = urllib.request.Request(
             'https://api.sendgrid.com/v3/mail/send',
             data=json_lib.dumps(email_data).encode(),
-            headers={'Authorization': f'Bearer {sendgrid_key}', 'Content-Type': 'application/json'},
+            headers={
+                'Authorization': 'Bearer ' + sendgrid_key,
+                'Content-Type': 'application/json'
+            },
             method='POST'
         )
         urllib.request.urlopen(req)
-        return jsonify({'message': f'Email sent to {user["email"]}!'}), 200
+        return jsonify({'message': 'Email sent to ' + user['email'] + '!'}), 200
     except Exception as e:
         return jsonify({'message': 'Email failed: ' + str(e)}), 500
 
-# ── PWA ──────────────────────────────────────────────────────
+# ── PWA ───────────────────────────────────────────────────────
 @app.route('/manifest.json')
 def manifest():
     return jsonify({
         "name": "InternSetu",
         "short_name": "InternSetu",
-        "description": "AI-powered internship matching platform",
+        "description": "AI-powered internship matching",
         "start_url": "/",
         "display": "standalone",
         "background_color": "#f8f9ff",
@@ -296,18 +371,10 @@ def manifest():
 
 @app.route('/sw.js')
 def service_worker():
-    sw_code = """
-const CACHE = 'internsetu-v1';
-const ASSETS = ['/', '/manifest.json'];
-self.addEventListener('install', e => e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS))));
-self.addEventListener('fetch', e => {
-  if(e.request.url.includes('/api/')) return;
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
-});
-"""
-    return Response(sw_code, mimetype='application/javascript')
+    sw = "const CACHE='is-v1';self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(['/']))));self.addEventListener('fetch',e=>{if(e.request.url.includes('/api/'))return;e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request)));});"
+    return Response(sw, mimetype='application/javascript')
 
-# ── SEED DATA ────────────────────────────────────────────────
+# ── SEED DATA ───────────────────────────────────────────────
 @app.route('/api/seed', methods=['POST'])
 def seed():
     if mongo.db.internships.count_documents({}) > 0:
@@ -330,134 +397,7 @@ def seed():
         {'id':'mcs1','company':'Microsoft','logo':'M','role':'Software Engineering Intern','location':'Hyderabad','mode':'Hybrid','stipend':50000,'domain':'Software Development','skills':['C#','.NET','Azure','JavaScript'],'deadline':'18 days','tags':['C#','Azure','Hybrid']},
     ]
     mongo.db.internships.insert_many(internships)
-    return jsonify({'message': f'Seeded {len(internships)} internships!'}), 201
-
-# ── ADMIN ROUTES ────────────────────────────────────────────
-ADMIN_KEY = os.environ.get('ADMIN_KEY', 'admin_internsetu_2026')
-
-def require_admin():
-    key = request.headers.get('X-Admin-Key') or request.args.get('key')
-    return key == ADMIN_KEY
-
-@app.route('/api/admin/internships', methods=['GET'])
-def admin_list_internships():
-    if not require_admin():
-        return jsonify({'message': 'Unauthorized'}), 401
-    internships = list(mongo.db.internships.find({}, {'_id': 0}))
-    return jsonify(internships), 200
-
-@app.route('/api/admin/internships', methods=['POST'])
-def admin_add_internship():
-    if not require_admin():
-        return jsonify({'message': 'Unauthorized'}), 401
-    data = request.get_json()
-    required = ['company', 'role', 'stipend', 'location']
-    if not all(k in data for k in required):
-        return jsonify({'message': 'Missing required fields'}), 400
-    # Generate id if not provided
-    if 'id' not in data:
-        data['id'] = data['company'].lower()[:3] + str(mongo.db.internships.count_documents({}))
-    mongo.db.internships.insert_one({k: v for k, v in data.items() if k != '_id'})
-    return jsonify({'message': f"Added {data['company']} internship!"}), 201
-
-@app.route('/api/admin/internships/<intern_id>', methods=['DELETE'])
-def admin_delete_internship(intern_id):
-    if not require_admin():
-        return jsonify({'message': 'Unauthorized'}), 401
-    result = mongo.db.internships.delete_one({'id': intern_id})
-    if result.deleted_count:
-        return jsonify({'message': 'Deleted!'}), 200
-    return jsonify({'message': 'Not found'}), 404
-
-@app.route('/api/admin/users', methods=['GET'])
-def admin_list_users():
-    if not require_admin():
-        return jsonify({'message': 'Unauthorized'}), 401
-    users = list(mongo.db.users.find({}, {'password': 0}))
-    for u in users:
-        u['_id'] = str(u['_id'])
-    return jsonify({'count': len(users), 'users': users}), 200
-
-# ── ANALYTICS ───────────────────────────────────────────────
-@app.route('/api/analytics', methods=['GET'])
-def analytics():
-    if not require_admin():
-        return jsonify({'message': 'Unauthorized'}), 401
-    total_users = mongo.db.users.count_documents({})
-    total_internships = mongo.db.internships.count_documents({})
-    # Most applied internships
-    pipeline = [
-        {'$unwind': '$applications'},
-        {'$group': {'_id': '$applications.company', 'count': {'$sum': 1}}},
-        {'$sort': {'count': -1}},
-        {'$limit': 5}
-    ]
-    top_companies = list(mongo.db.users.aggregate(pipeline))
-    # Skill distribution
-    skill_pipeline = [
-        {'$unwind': '$skills'},
-        {'$group': {'_id': '$skills', 'count': {'$sum': 1}}},
-        {'$sort': {'count': -1}},
-        {'$limit': 10}
-    ]
-    top_skills = list(mongo.db.users.aggregate(skill_pipeline))
-    return jsonify({
-        'total_users': total_users,
-        'total_internships': total_internships,
-        'top_applied_companies': [{'company': c['_id'], 'applications': c['count']} for c in top_companies],
-        'top_skills': [{'skill': s['_id'], 'count': s['count']} for s in top_skills]
-    }), 200
-
-# ── MATCH EXPLANATION ────────────────────────────────────────
-@app.route('/api/internships/<intern_id>/match-reason', methods=['GET'])
-@jwt_required()
-def match_reason(intern_id):
-    uid = get_jwt_identity()
-    user = mongo.db.users.find_one({'_id': ObjectId(uid)})
-    intern = mongo.db.internships.find_one({'id': intern_id}, {'_id': 0})
-    if not intern or not user:
-        return jsonify({'message': 'Not found'}), 404
-    user_skills = set(s.lower() for s in user.get('skills', []))
-    req_skills = intern.get('skills', [])
-    matched = [s for s in req_skills if s.lower() in user_skills]
-    missing = [s for s in req_skills if s.lower() not in user_skills]
-    score = int((len(matched) / len(req_skills)) * 100) if req_skills else 50
-    return jsonify({
-        'match_score': score,
-        'matched_skills': matched,
-        'missing_skills': missing,
-        'total_required': len(req_skills),
-        'you_have': len(matched)
-    }), 200
-
-# ── DEADLINE COUNTDOWN ───────────────────────────────────────
-@app.route('/api/internships/closing-soon', methods=['GET'])
-def closing_soon():
-    # Return internships with deadline <= 3 days
-    internships = list(mongo.db.internships.find({}, {'_id': 0}))
-    urgent = [i for i in internships if '1 day' in i.get('deadline', '') or '2 day' in i.get('deadline', '') or '3 day' in i.get('deadline', '')]
-    return jsonify(urgent), 200
-
-# ── SEARCH ───────────────────────────────────────────────────
-@app.route('/api/internships/search', methods=['GET'])
-def search_internships():
-    q = request.args.get('q', '').lower()
-    domain = request.args.get('domain', '')
-    min_stipend = int(request.args.get('min_stipend', 0))
-    mode = request.args.get('mode', '')
-    internships = list(mongo.db.internships.find({}, {'_id': 0}))
-    results = []
-    for i in internships:
-        if q and q not in i.get('company','').lower() and q not in i.get('role','').lower() and not any(q in s.lower() for s in i.get('skills',[])):
-            continue
-        if domain and domain.lower() not in i.get('domain','').lower():
-            continue
-        if min_stipend and i.get('stipend', 0) < min_stipend:
-            continue
-        if mode and mode.lower() not in i.get('mode','').lower():
-            continue
-        results.append(i)
-    return jsonify(results), 200
+    return jsonify({'message': 'Seeded ' + str(len(internships)) + ' internships!'}), 201
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)
