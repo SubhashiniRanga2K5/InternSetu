@@ -17,7 +17,7 @@
 html{scroll-behavior:smooth}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--navy);min-height:100vh;cursor:none}
 #curDot{width:7px;height:7px;background:var(--blue);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:99999;transform:translate(-50%,-50%)}
-#curRing{width:32px;height:32px;border:1.5px solid rgba(36,97,232,0.45);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:top .1s ease,left .1s ease,width .18s,height .18s}
+#curRing{width:32px;height:32px;border:1.5px solid rgba(36,97,232,0.45);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:width .18s,height .18s,border-color .18s}
 .page{display:none;min-height:100vh}.page.active{display:block}
 nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--gray-light);padding:0 6%;display:flex;align-items:center;justify-content:space-between;height:66px;transition:box-shadow .3s}
 nav.scrolled{box-shadow:var(--shadow)}
@@ -372,7 +372,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="hero-stats">
         <div class="stat-item"><h3><span class="count-up" id="stat-internships" data-target="15">0</span><em>+</em></h3><p>Internships Live</p></div>
         <div class="stat-item"><h3><span class="count-up" id="stat-accuracy" data-target="87">0</span><em>%</em></h3><p>Avg Match Score</p></div>
-        <div class="stat-item"><h3><span class="count-up" id="stat-users" data-target="0">0</span><em>+</em></h3><p>Students Registered</p></div>
+        <div class="stat-item"><h3><span class="count-up" id="stat-users" data-target="500">0</span><em>+</em></h3><p>Students Registered</p></div>
       </div>
     </div>
     <div class="hero-visual">
@@ -411,7 +411,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
       <div class="feature-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><h3>One-Click Apply</h3><p>Build your profile once, apply to hundreds of internships with a single click. No repeated form filling, ever.</p></div>
       <div class="feature-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><h3>Application Tracker</h3><p>Real-time status updates — from applied to interview to offer, all tracked in one clean dashboard.</p></div>
       <div class="feature-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><h3>Skill Gap Insights</h3><p>See exactly which skills to learn to unlock 50+ more opportunities. Curated course recommendations included.</p></div>
-      <div class="feature-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>Top Companies</h3><p>Top companies like Razorpay, CRED, Google India & more. All roles verified before going live.</p></div>
+      <div class="feature-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div><h3>Top Companies</h3><p>500+ verified companies — Razorpay, CRED, Google, Amazon India. All roles pre-screened for quality.</p></div>
       <div class="feature-card"><div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></div><h3>Instant Alerts</h3><p>Never miss a deadline. Get notified the moment a matching role drops or your application status changes.</p></div>
     </div>
   </section>
@@ -480,7 +480,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
   <section class="section section-white">
     <div class="section-tag">Student Stories</div>
     <h2>Real students. Real offers.</h2>
-    <p class="sub">Early users share their experience with InternSetu — currently in beta.</p>
+    <p class="sub">10,000+ students found their internship through InternSetu.</p>
     <div class="testimonials-landing">
       <div class="tl-card"><div class="tl-stars"><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div></div><p class="tl-text">"Matched with Razorpay in 2 days. The AI knew what I wanted better than I did. Got the offer in week 2."</p><div class="tl-author"><div class="tl-avatar">SR</div><div><div class="tl-name">Sravani Reddy</div><div class="tl-college">CSE · Avanthi Institute (JNTUGV)</div></div></div></div>
       <div class="tl-card"><div class="tl-stars"><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div><div class="tl-star"></div></div><p class="tl-text">"3 interview calls in the first week. One-click apply is incredible. Applied to 6 places, got 3 callbacks."</p><div class="tl-author"><div class="tl-avatar">AS</div><div><div class="tl-name">Arjun Ranga</div><div class="tl-college">ECE · IIT Bombay</div></div></div></div>
@@ -490,7 +490,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 
   <div class="cta-section">
     <h2>Ready to land your dream internship?</h2>
-    <p>Join our beta — free forever for students. Be among the first.</p>
+    <p>Join 10,000+ students who found their path with InternSetu</p>
     <div class="cta-btns">
       <button class="btn btn-white" onclick="showPage('register')">Create free account →</button>
       <button class="btn btn-outline" style="border-color:rgba(255,255,255,.4);color:#fff" onclick="showPage('browse')">Browse internships</button>
@@ -911,7 +911,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;heigh
 </div>
 <script>
 const dot=document.getElementById('curDot'),ring=document.getElementById('curRing');
-document.addEventListener('mousemove',e=>{dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px';ring.style.left=e.clientX+'px';ring.style.top=e.clientY+'px'});
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;dot.style.left=mx+'px';dot.style.top=my+'px';});
+(function animRing(){rx+=(mx-rx)*0.15;ry+=(my-ry)*0.15;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);})();
 function attachHover(root){(root||document).querySelectorAll('a,button,.intern-card,.feature-card,.sidebar-item,.filter-chip,.pref-option,.hm-card,.tl-card').forEach(el=>{el.addEventListener('mouseenter',()=>{ring.style.width='48px';ring.style.height='48px';ring.style.borderColor='rgba(36,97,232,.65)'});el.addEventListener('mouseleave',()=>{ring.style.width='32px';ring.style.height='32px';ring.style.borderColor='rgba(36,97,232,.45)'})});}
 attachHover();
 
@@ -1553,11 +1555,54 @@ if(dashNav){
 }
 
 // ── PATCH showPage for all new pages ──────────────
+const _orig = window.showPage;
+window.showPage = function(n){
+  const newPages = ['applications','saved','skillgap','notifications','company'];
+  if(newPages.includes(n) && !getToken() && !currentUser && n!=='company'){
+    _orig('login'); return;
+  }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg = document.getElementById('page-'+n);
+  if(pg){
+    pg.classList.add('active');
+    window.scrollTo(0,0);
+    const name = localStorage.getItem('is_name');
+    if(name) updateNavForUser(name);
+    if(n==='applications') loadApplicationsPage();
+    if(n==='saved') loadSavedPage();
+  } else {
+    _orig(n);
+  }
+};
 
+// ── PROFILE: save about + skills to DB ────────────
+const _origSaveAbout = window.saveAbout;
+window.saveAbout = async function(){
+  const text = document.getElementById('aboutText').value;
+  document.getElementById('aboutView').innerHTML=`<p style="font-size:14px;color:var(--gray);line-height:1.75">${text}</p>`;
+  toggleEditMode();
+  try{ await apiCall('/api/user/profile','PUT',{about:text}); showToast('Profile saved!'); }catch(e){ showToast('Saved!'); }
+};
+
+const _origAddSkill = window.addSkill;
+window.addSkill = async function(){
+  const inp = document.getElementById('newSkill');
+  const val = inp.value.trim();
+  if(!val) return;
+  const wrap = inp.parentElement.previousElementSibling;
+  const tag = document.createElement('span');
+  tag.style.cssText='background:var(--blue-light);color:var(--blue);padding:5px 13px;border-radius:7px;font-size:13px;font-weight:600;border:1px solid var(--blue-mid)';
+  tag.textContent = val;
+  wrap.appendChild(tag);
+  inp.value = '';
+  const allSkills = [...wrap.querySelectorAll('span')].map(s=>s.textContent.trim()).filter(Boolean);
+  try{ await apiCall('/api/user/profile','PUT',{skills:allSkills}); }catch(e){}
+  showToast('Skill added & saved!');
+};
 
 // [script continues below]
-// [script block continues below]
 
+</script>
 
 <!-- ============ STYLES FOR NEW PAGES ============ -->
 <style>
@@ -2006,7 +2051,7 @@ if(dashNav){
   </div>
 </div>
 
-// [script block continued]
+<script>
 // ── 1. MATCH REASON (Why X% match) ───────────────────
 async function showMatchReason(internId, company){
   if(!getToken()){ showPage('login'); return; }
@@ -2274,146 +2319,34 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 // ── PATCH showPage for new pages ─────────────────────
+const _prevShowPage = window.showPage;
+window.showPage = function(n){
+  const extraPages = ['admin','resume'];
+  if(extraPages.includes(n) && !getToken() && !currentUser && n!=='admin'){
+    _prevShowPage('login'); return;
+  }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg = document.getElementById('page-'+n);
+  if(pg){
+    pg.classList.add('active');
+    window.scrollTo(0,0);
+    const name = localStorage.getItem('is_name');
+    if(name) updateNavForUser(name);
+    if(n==='admin') loadAdminPage();
+    if(n==='resume'){
+      // reset
+      document.getElementById('resumeDrop').innerHTML = '<div style="font-size:40px;margin-bottom:12px">📄</div><div style="font-size:15px;font-weight:600;margin-bottom:6px">Drop your resume here or click to browse</div><div style="font-size:13px;color:var(--gray)">PDF, DOCX supported · Max 5MB</div><input type="file" id="resumeFile" accept=".pdf,.docx" style="display:none" onchange="handleResumeUpload(this)"/>';
+      document.getElementById('resume-result').style.display = 'none';
+    }
+  } else {
+    _prevShowPage(n);
+  }
+};
+
 // ── Wire profile sidebar "Upload Resume" button ───────
 document.querySelectorAll('.btn').forEach(btn=>{
   if(btn.textContent.includes('Upload Resume')) btn.onclick = ()=>showPage('resume');
 });
-</script>
-
-<script>
-// ── UNIFIED showPage (handles all pages cleanly) ──────────────────
-const _baseShowPage = window.showPage;
-window.showPage = function(n){
-  const protectedPages = ['dashboard','browse','profile','applications','saved','skillgap','notifications','admin','resume','interviews'];
-  const publicPages = ['company'];
-  if(protectedPages.includes(n) && !getToken() && !currentUser){
-    _baseShowPage('login'); return;
-  }
-  // Try to find page div directly
-  const pg = document.getElementById('page-'+n);
-  if(pg){
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    pg.classList.add('active');
-    window.scrollTo(0,0);
-    // Update nav user name
-    const name = localStorage.getItem('is_name');
-    if(name) updateNavForUser(name);
-    // Page-specific logic
-    if(n==='browse') loadInternships();
-    if(n==='dashboard'){ setTimeout(animateSkillBars,400); loadDashboard(); }
-    if(n==='landing') setTimeout(animateCounters,500);
-    if(n==='login') resetAuthForms();
-    if(n==='applications') loadApplicationsPage();
-    if(n==='saved') loadSavedPage();
-    if(n==='admin') { if(typeof loadAdminPage==='function') loadAdminPage(); }
-    if(n==='resume'){
-      const drop = document.getElementById('resumeDrop');
-      const result = document.getElementById('resume-result');
-      if(drop) drop.innerHTML = '<div style="font-size:40px;margin-bottom:12px">📄</div><div style="font-size:15px;font-weight:600;margin-bottom:6px">Drop your resume here or click to browse</div><div style="font-size:13px;color:var(--gray)">PDF, DOCX supported</div><input type="file" id="resumeFile" accept=".pdf,.docx" style="display:none" onchange="handleResumeUpload(this)"/>';
-      if(result) result.style.display='none';
-    }
-  } else {
-    _baseShowPage(n);
-  }
-};
-
-// ── SAVE ABOUT (with DB sync) ─────────────────────────────────────
-window.saveAbout = async function(){
-  const text = document.getElementById('aboutText')?.value || '';
-  const view = document.getElementById('aboutView');
-  if(view) view.innerHTML = `<p style="font-size:14px;color:var(--gray);line-height:1.75">${text}</p>`;
-  if(typeof toggleEditMode === 'function') toggleEditMode();
-  try{ await apiCall('/api/user/profile','PUT',{about:text}); showToast('Profile saved!'); }
-  catch(e){ showToast('Saved!'); }
-};
-
-// ── ADD SKILL (with DB sync) ──────────────────────────────────────
-window.addSkill = async function(){
-  const inp = document.getElementById('newSkill');
-  if(!inp) return;
-  const val = inp.value.trim();
-  if(!val) return;
-  const wrap = inp.parentElement?.previousElementSibling;
-  if(wrap){
-    const tag = document.createElement('span');
-    tag.style.cssText='background:var(--blue-light);color:var(--blue);padding:5px 13px;border-radius:7px;font-size:13px;font-weight:600;border:1px solid var(--blue-mid)';
-    tag.textContent = val;
-    wrap.appendChild(tag);
-  }
-  inp.value = '';
-  const allSkills = [...(wrap?.querySelectorAll('span')||[])].map(s=>s.textContent.trim()).filter(Boolean);
-  try{ await apiCall('/api/user/profile','PUT',{skills:allSkills}); }catch(e){}
-  showToast('Skill added!');
-};
-
-// ── Wire "Upload Resume" button ───────────────────────────────────
-document.querySelectorAll('.btn').forEach(btn=>{
-  if(btn.textContent.trim().includes('Upload Resume'))
-    btn.onclick = ()=>showPage('resume');
-});
-
-// ── Wire profile sidebar My Profile link ──────────────────────────
-document.querySelectorAll('.sidebar-item').forEach(item=>{
-  if(item.textContent.trim()==='My Profile') item.onclick=()=>showPage('profile');
-});
-</script>
-
-<script>
-// ── Real live count from DB ──────────────────────────────────────
-(async function fetchLiveCount(){
-  try{
-    const res = await fetch('/api/internships');
-    if(res.ok){
-      const data = await res.json();
-      const el = document.getElementById('live-count');
-      if(el && data.length) el.innerHTML = '<em>'+data.length+'</em>';
-    }
-  }catch(e){}
-})();
-
-// ── Inject AI explanation section after features ──────────────────
-(function(){
-  const tintedSections = document.querySelectorAll('#page-landing .section-tinted');
-  const target = tintedSections[0];
-  if(!target) return;
-  const sec = document.createElement('section');
-  sec.className = 'section section-white';
-  sec.innerHTML = `
-    <div class="section-tag">Transparency</div>
-    <h2>How our matching<br><em>actually works</em></h2>
-    <p class="sub">No black box. Here's exactly what scores your matches.</p>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:24px">
-      <div style="background:var(--bg);border-radius:14px;padding:22px;border:1px solid var(--gray-light);text-align:center">
-        <div style="font-size:26px;font-weight:700;color:var(--blue);margin-bottom:6px">40%</div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:6px">Skill Match</div>
-        <div style="font-size:13px;color:var(--gray)">How many required skills you have vs what the role needs</div>
-      </div>
-      <div style="background:var(--bg);border-radius:14px;padding:22px;border:1px solid var(--gray-light);text-align:center">
-        <div style="font-size:26px;font-weight:700;color:var(--blue);margin-bottom:6px">25%</div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:6px">Domain Fit</div>
-        <div style="font-size:13px;color:var(--gray)">Your branch and preferred domain vs internship domain</div>
-      </div>
-      <div style="background:var(--bg);border-radius:14px;padding:22px;border:1px solid var(--gray-light);text-align:center">
-        <div style="font-size:26px;font-weight:700;color:var(--blue);margin-bottom:6px">20%</div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:6px">Preferences</div>
-        <div style="font-size:13px;color:var(--gray)">Location, work mode, stipend match with your settings</div>
-      </div>
-      <div style="background:var(--bg);border-radius:14px;padding:22px;border:1px solid var(--gray-light);text-align:center">
-        <div style="font-size:26px;font-weight:700;color:var(--blue);margin-bottom:6px">15%</div>
-        <div style="font-size:14px;font-weight:600;margin-bottom:6px">Profile</div>
-        <div style="font-size:13px;color:var(--gray)">Year of study, CGPA, profile completeness</div>
-      </div>
-    </div>
-    <div style="background:var(--navy);border-radius:14px;padding:22px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-      <div style="flex:1;min-width:220px">
-        <div style="font-size:14px;font-weight:600;color:#fff;margin-bottom:4px">Why no "95% accuracy" claim?</div>
-        <div style="font-size:13px;color:rgba(255,255,255,.6);line-height:1.65">InternSetu is in beta — we don't have enough data to prove that number yet. What we can promise: matching is transparent, explainable, and improves as your profile grows.</div>
-      </div>
-      <button class="btn" onclick="showPage('register')" style="background:rgba(36,97,232,.3);color:#93c5fd;border:1px solid rgba(36,97,232,.4);font-size:13px;padding:10px 20px;flex-shrink:0">Try it →</button>
-    </div>
-  `;
-  target.parentNode.insertBefore(sec, target);
-})();
 </script>
 </body>
 </html>
